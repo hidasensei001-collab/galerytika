@@ -13,13 +13,13 @@
 
 <style>
 :root {
-  --bg-dark: #090d12;
+  --bg-dark: #070a0e;
   --primary: #00d285;
   --primary-hover: #00b371;
-  --glass-bg: rgba(18, 26, 36, 0.75);
+  --glass-bg: rgba(13, 20, 29, 0.82);
   --glass-border: rgba(255, 255, 255, 0.12);
-  --glass-card: rgba(30, 41, 59, 0.7);
-  --text-main: #f1f5f9;
+  --glass-card: rgba(22, 32, 45, 0.75);
+  --text-main: #f8fafc;
   --text-sub: #94a3b8;
   --accent: #38bdf8;
 }
@@ -53,7 +53,7 @@ html, body {
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
-  transition: background-image 0.5s ease-in-out, background-size 0.3s ease;
+  transition: background-image 0.6s ease-in-out, background-size 0.3s ease;
 }
 
 .bg-player.fit-contain {
@@ -65,7 +65,7 @@ html, body {
   position: absolute;
   inset: 0;
   z-index: 2;
-  background: linear-gradient(180deg, rgba(9,13,18,0.65) 0%, rgba(9,13,18,0.1) 40%, rgba(9,13,18,0.1) 60%, rgba(9,13,18,0.85) 100%);
+  background: linear-gradient(180deg, rgba(7,10,14,0.7) 0%, rgba(7,10,14,0.15) 35%, rgba(7,10,14,0.15) 65%, rgba(7,10,14,0.88) 100%);
   pointer-events: none;
 }
 
@@ -76,13 +76,13 @@ html, body {
   left: 0;
   right: 0;
   z-index: 10;
-  padding: 16px 20px;
+  padding: 14px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   background: var(--glass-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
   border-bottom: 1px solid var(--glass-border);
 }
 
@@ -124,9 +124,21 @@ html, body {
 
 .btn-tool:hover, .btn-tool:active {
   background: var(--primary);
-  color: #090d12;
+  color: #070a0e;
   border-color: var(--primary);
   transform: translateY(-1px);
+}
+
+.btn-primary-highlight {
+  background: var(--primary);
+  color: #070a0e;
+  border-color: var(--primary);
+  font-weight: 700;
+  box-shadow: 0 0 12px rgba(0,210,133,0.3);
+}
+
+.btn-primary-highlight:hover {
+  background: var(--primary-hover);
 }
 
 .btn-icon-only {
@@ -156,13 +168,13 @@ html, body {
   cursor: pointer;
   backdrop-filter: blur(10px);
   transition: all 0.2s ease;
-  opacity: 0.75;
+  opacity: 0.8;
 }
 
 .nav-arrow:hover {
   opacity: 1;
   background: var(--primary);
-  color: #090d12;
+  color: #070a0e;
   transform: translateY(-50%) scale(1.1);
 }
 
@@ -176,13 +188,13 @@ html, body {
   left: 0;
   right: 0;
   z-index: 10;
-  padding: 16px 20px;
+  padding: 14px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   background: var(--glass-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
   border-top: 1px solid var(--glass-border);
 }
 
@@ -196,7 +208,7 @@ html, body {
   font-size: 14px;
   font-weight: 700;
   color: #fff;
-  max-width: 250px;
+  max-width: 260px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -206,16 +218,19 @@ html, body {
   font-size: 12px;
   color: var(--primary);
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-/* MODAL DRAWER GALERI GRID */
+/* MODAL DRAWER GALERI GRID RAPI */
 .modal-gallery {
   position: fixed;
   inset: 0;
   z-index: 100;
-  background: rgba(9, 13, 18, 0.88);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(7, 10, 14, 0.92);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   display: none;
   flex-direction: column;
   padding: 20px;
@@ -227,7 +242,7 @@ html, body {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
@@ -235,8 +250,8 @@ html, body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
-  padding-bottom: 12px;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
   border-bottom: 1px solid var(--glass-border);
 }
 
@@ -247,6 +262,7 @@ html, body {
   grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
   gap: 14px;
   padding-right: 4px;
+  align-content: start;
 }
 
 .thumb-card {
@@ -257,17 +273,18 @@ html, body {
   border-radius: 14px;
   overflow: hidden;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.22s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
 .thumb-card:hover {
-  transform: scale(1.03);
+  transform: translateY(-3px) scale(1.02);
   border-color: var(--accent);
 }
 
 .thumb-card.active {
   border-color: var(--primary);
-  box-shadow: 0 0 15px rgba(0,210,133,0.4);
+  box-shadow: 0 0 18px rgba(0,210,133,0.5);
 }
 
 .thumb-card img {
@@ -277,20 +294,34 @@ html, body {
   display: block;
 }
 
+.thumb-card .thumb-badge {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  background: rgba(7, 10, 14, 0.75);
+  color: var(--primary);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 6px;
+  backdrop-filter: blur(4px);
+}
+
 .thumb-card .thumb-title {
   position: absolute;
   bottom: 0;
   inset-x: 0;
-  background: linear-gradient(180deg, transparent, rgba(0,0,0,0.85));
-  font-size: 10px;
-  padding: 6px 8px;
+  background: linear-gradient(180deg, transparent, rgba(0,0,0,0.9));
+  font-size: 11px;
+  font-weight: 600;
+  padding: 8px 8px 6px;
   color: #fff;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* EMPTY STATE & LOADING */
+/* LOADING & EMPTY STATE */
 .loading-box {
   position: absolute;
   inset: 0;
@@ -305,8 +336,8 @@ html, body {
 }
 
 .spinner {
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   border: 3px solid rgba(255,255,255,0.1);
   border-top-color: var(--primary);
   border-radius: 50%;
@@ -348,7 +379,7 @@ html, body {
   .nav-arrow { width: 44px; height: 44px; font-size: 16px; }
   .nav-prev { left: 10px; }
   .nav-next { right: 10px; }
-  .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
+  .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(105px, 1fr)); gap: 10px; }
 }
 </style>
 </head>
@@ -358,7 +389,7 @@ html, body {
 <!-- LOADING SCREEN -->
 <div class="loading-box" id="loadingBox">
   <div class="spinner"></div>
-  <div style="font-size: 14px; font-weight: 600;">Memindai file WebP...</div>
+  <div style="font-size: 14px; font-weight: 600;">Memindai koleksi WebP...</div>
 </div>
 
 <!-- BACKGROUND ANIMATION PLAYER -->
@@ -368,12 +399,18 @@ html, body {
 <!-- HEADER BAR -->
 <header class="app-header">
   <div class="app-title">
-    <i class="fa-solid fa-play"></i>
+    <i class="fa-solid fa-circle-play"></i>
     <span>Galery Tika</span>
   </div>
 
   <div class="header-tools">
-    <!-- TAMBAH / UPLOAD FILE WEBP -->
+    <!-- TOMBOL UTAMA BUKAI GALERI GRID -->
+    <button class="btn-tool btn-primary-highlight" onclick="openGalleryModal()" title="Buka Kumpulan Galeri">
+      <i class="fa-solid fa-border-all"></i>
+      <span>Galeri</span>
+    </button>
+
+    <!-- UPLOAD FILE WEBP LOKAL -->
     <button class="btn-tool" onclick="document.getElementById('fileInput').click()" title="Tambah / Upload File WebP">
       <i class="fa-solid fa-folder-plus"></i>
       <span>Upload</span>
@@ -385,20 +422,14 @@ html, body {
       <i class="fa-solid fa-expand"></i>
     </button>
 
-    <!-- SLIDESHOW AUTOMATIC ROTATION -->
-    <button class="btn-tool btn-icon-only" id="btnAutoPlay" onclick="toggleAutoPlay()" title="Putar Otomatis (Slideshow)">
-      <i class="fa-solid fa-rotate"></i>
-    </button>
-
-    <!-- GRID GALERI -->
-    <button class="btn-tool" onclick="openGalleryModal()" title="Buka Daftar Galeri">
-      <i class="fa-solid fa-border-all"></i>
-      <span>Galeri</span>
+    <!-- ROTASI OTOMATIS PAUSE/PLAY -->
+    <button class="btn-tool btn-icon-only" id="btnAutoPlay" onclick="toggleAutoPlay()" title="Putar Otomatis 20 Detik (Random)">
+      <i class="fa-solid fa-shuffle"></i>
     </button>
   </div>
 </header>
 
-<!-- NAVIGASI TOMBOL SAMPAING -->
+<!-- NAVIGASI TOMBOL SAMPING -->
 <button class="nav-arrow nav-prev" onclick="prevWebp()" title="Animasi Sebelumnya">
   <i class="fa-solid fa-chevron-left"></i>
 </button>
@@ -411,7 +442,9 @@ html, body {
 <footer class="app-footer">
   <div class="info-box">
     <div class="file-name-text" id="fileNameText">Memuat...</div>
-    <div class="counter-badge" id="counterText">0 / 0 WebP</div>
+    <div class="counter-badge" id="counterText">
+      <i class="fa-solid fa-clock-rotate-left"></i> 0 / 0 WebP (20s Random)
+    </div>
   </div>
 
   <div style="display: flex; gap: 8px;">
@@ -421,12 +454,12 @@ html, body {
   </div>
 </footer>
 
-<!-- MODAL GALERI GRID -->
+<!-- MODAL GALERI GRID RAPI -->
 <div class="modal-gallery" id="galleryModal">
   <div class="gallery-header">
     <div style="display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 700;">
       <i class="fa-solid fa-images" style="color: var(--primary);"></i>
-      <span>Koleksi WebP Galery Tika</span>
+      <span>Koleksi Animasi Galery Tika</span>
     </div>
     <button class="btn-tool btn-icon-only" onclick="closeGalleryModal()">
       <i class="fa-solid fa-xmark"></i>
@@ -445,27 +478,70 @@ html, body {
 /* ============================================================
    GLOBAL VARIABLES & STATE MANAGEMENT
 ============================================================ */
-let webpList = [];             // Daftar URL / Path file WebP
-let currentIndex = 0;          // Index file WebP yang aktif
-let isFitContain = false;      // Mode ukuran gambar (Cover vs Contain)
-let isAutoPlay = false;        // Status putar otomatis
-let autoPlayTimer = null;      // Interval timer slideshow
-let autoPlayIntervalMs = 5000; // Jeda putar otomatis (5 detik)
+let webpList = [];              // Daftar URL / Path file WebP
+let currentIndex = 0;           // Index file WebP yang sedang tayang
+let isFitContain = false;       // Mode ukuran gambar (Cover vs Contain)
+let isAutoPlay = true;          // Status rotasi acak otomatis (Default: AKTIF)
+let autoPlayTimer = null;       // Interval timer rotasi
+const AUTO_PLAY_DELAY_MS = 20000; // ROTASI 20 DETIK
+let randomDeck = [];            // Deck untuk acak tanpa pengulangan langsung
 
-/* Touch / Swipe State */
+/* Touch / Swipe Gestures */
 let touchStartX = 0;
 let touchStartY = 0;
 
 /* ============================================================
-   DETEKSI & PEMINDAIAN FILE WEBP DYNAMIC UNLIMITED
+   ROTASI RANDOM & SHUFFLE DECK LOGIC
 ============================================================ */
+function getNextRandomIndex() {
+  if (webpList.length <= 1) return 0;
 
-// 1. Pindai folder server lokal/hosting secara otomatis
+  if (randomDeck.length === 0) {
+    // Isi deck dengan semua index yang ada
+    randomDeck = Array.from({ length: webpList.length }, (_, i) => i);
+    // Acak deck (Fisher-Yates Shuffle)
+    for (let i = randomDeck.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [randomDeck[i], randomDeck[j]] = [randomDeck[j], randomDeck[i]];
+    }
+    // Jika elemen pertama sama dengan yang sedang aktif, tukar agar tidak berulang beruntun
+    if (randomDeck[randomDeck.length - 1] === currentIndex) {
+      const temp = randomDeck[randomDeck.length - 1];
+      randomDeck[randomDeck.length - 1] = randomDeck[0];
+      randomDeck[0] = temp;
+    }
+  }
+
+  return randomDeck.pop();
+}
+
+function startAutoPlayTimer() {
+  stopAutoPlayTimer();
+  if (isAutoPlay) {
+    autoPlayTimer = setInterval(() => {
+      if (webpList.length > 1) {
+        currentIndex = getNextRandomIndex();
+        updatePlayer();
+      }
+    }, AUTO_PLAY_DELAY_MS);
+  }
+}
+
+function stopAutoPlayTimer() {
+  if (autoPlayTimer) {
+    clearInterval(autoPlayTimer);
+    autoPlayTimer = null;
+  }
+}
+
+/* ============================================================
+   DETEKSI & PEMINDAIAN FILE WEBP AUTOMATIC
+============================================================ */
 async function scanDirectoryForWebp() {
   const foundFiles = new Set();
 
+  // 1. Pindai direktori root server
   try {
-    // Mencoba fetch root direktori untuk membaca listing file server (Apache/Nginx/LiveServer)
     const response = await fetch('./', { cache: 'no-cache' });
     if (response.ok) {
       const htmlText = await response.text();
@@ -480,11 +556,9 @@ async function scanDirectoryForWebp() {
         }
       });
     }
-  } catch (err) {
-    console.log("Pindaian direktori otomatis terbatas oleh CORS/Server. Menggunakan mode probing.");
-  }
+  } catch (err) {}
 
-  // 2. Jika tidak mendapatkan file via directory index, coba membaca file 'list.json' jika disiapkan
+  // 2. Pembacaan list.json jika ada
   if (foundFiles.size === 0) {
     try {
       const resJson = await fetch('list.json');
@@ -499,18 +573,16 @@ async function scanDirectoryForWebp() {
     } catch(e) {}
   }
 
-  // 3. Fallback Probing Luas (Memeriksa hingga puluhan format penamaan umum)
+  // 3. Fallback Probing Luas (Angka, bg, anim, tika, photo)
   if (foundFiles.size === 0) {
     const probeCandidates = [];
-    
-    // Probing angka standar: 1.webp s/d 150.webp
     for (let i = 1; i <= 150; i++) {
       probeCandidates.push(`${i}.webp`);
-      probeCandidates.push(`bg${String(i).padStart(3, '0')}.webp`); // bg001.webp
-      probeCandidates.push(`bg${i}.webp`);                         // bg1.webp
-      probeCandidates.push(`anim${i}.webp`);                       // anim1.webp
-      probeCandidates.push(`photo${i}.webp`);                      // photo1.webp
-      probeCandidates.push(`tika${i}.webp`);                       // tika1.webp
+      probeCandidates.push(`bg${String(i).padStart(3, '0')}.webp`);
+      probeCandidates.push(`bg${i}.webp`);
+      probeCandidates.push(`anim${i}.webp`);
+      probeCandidates.push(`tika${i}.webp`);
+      probeCandidates.push(`photo${i}.webp`);
     }
 
     const probePromise = (url) => new Promise(resolve => {
@@ -520,7 +592,6 @@ async function scanDirectoryForWebp() {
       img.src = url;
     });
 
-    // Jalankan tes paralel
     const batchResults = await Promise.all(probeCandidates.map(probePromise));
     batchResults.filter(Boolean).forEach(url => foundFiles.add(url));
   }
@@ -541,15 +612,15 @@ async function initApp() {
       url: file
     }));
   } else {
-    // Jika tidak ada file terdeteksi di folder, tampilkan pesan petunjuk
     showToast("⚠️ Belum ada file .webp di folder. Silakan klik 'Upload'!");
   }
 
   showLoading(false);
 
   if (webpList.length > 0) {
-    currentIndex = 0;
+    currentIndex = Math.floor(Math.random() * webpList.length); // Putar acak pertama kali
     updatePlayer();
+    startAutoPlayTimer();
   } else {
     document.getElementById('fileNameText').innerText = "Belum Ada File WebP";
     document.getElementById('counterText').innerText = "0 / 0 WebP";
@@ -574,14 +645,14 @@ function updatePlayer() {
   const currentItem = webpList[currentIndex];
   const bgPlayer = document.getElementById('bgPlayer');
   
-  // Tampilkan gambar WebP
+  // Tampilkan gambar WebP penuh
   bgPlayer.style.backgroundImage = `url('${currentItem.url}')`;
 
-  // Update Teks Informasi
+  // Update Teks Informasi Footer
   document.getElementById('fileNameText').innerText = currentItem.name;
-  document.getElementById('counterText').innerText = `${currentIndex + 1} / ${webpList.length} WebP`;
+  document.getElementById('counterText').innerHTML = `<i class="fa-solid fa-clock-rotate-left"></i> ${currentIndex + 1} / ${webpList.length} WebP (20s Random)`;
 
-  // Update status di galeri grid jika sedang terbuka
+  // Tandai gambar aktif jika galeri terbuka
   updateActiveGridThumbnail();
 }
 
@@ -589,12 +660,14 @@ function nextWebp() {
   if (webpList.length === 0) return;
   currentIndex = (currentIndex + 1) % webpList.length;
   updatePlayer();
+  startAutoPlayTimer(); // Reset timer 20 detik setelah interaksi manual
 }
 
 function prevWebp() {
   if (webpList.length === 0) return;
   currentIndex = (currentIndex - 1 + webpList.length) % webpList.length;
   updatePlayer();
+  startAutoPlayTimer(); // Reset timer 20 detik setelah interaksi manual
 }
 
 function selectWebp(index) {
@@ -602,11 +675,13 @@ function selectWebp(index) {
     currentIndex = index;
     updatePlayer();
     closeGalleryModal();
+    startAutoPlayTimer(); // Reset timer 20 detik
+    showToast(`▶️ Memutar: ${webpList[index].name}`);
   }
 }
 
 /* ============================================================
-   KONTROL MODE UKURAN & SLIDESHOW OTOMATIS
+   KONTROL MODE UKURAN & AUTO-PLAY ROTASI
 ============================================================ */
 function toggleFitMode() {
   isFitContain = !isFitContain;
@@ -630,18 +705,17 @@ function toggleAutoPlay() {
 
   if (isAutoPlay) {
     btn.style.color = 'var(--primary)';
-    autoPlayTimer = setInterval(nextWebp, autoPlayIntervalMs);
-    showToast('🔄 Putar Otomatis Aktif (5 detik)');
+    startAutoPlayTimer();
+    showToast('🔄 Rotasi Otomatis 20s Aktif (Random)');
   } else {
     btn.style.color = 'var(--text-main)';
-    clearInterval(autoPlayTimer);
-    autoPlayTimer = null;
-    showToast('⏸️ Putar Otomatis Dihentikan');
+    stopAutoPlayTimer();
+    showToast('⏸️ Rotasi Otomatis Dihentikan');
   }
 }
 
 /* ============================================================
-   HANDLER UPLOAD LANGSUNG FILE WEBP
+   UPLOAD LANGSUNG FILE WEBP
 ============================================================ */
 function handleFileUpload(event) {
   const files = Array.from(event.target.files);
@@ -661,13 +735,11 @@ function handleFileUpload(event) {
   });
 
   if (addedCount > 0) {
-    showToast(`✅ ${addedCount} animasi WebP berhasil ditambahkan!`);
-    if (webpList.length === addedCount) {
-      currentIndex = 0;
-    } else {
-      currentIndex = webpList.length - addedCount; // Langsung tampilkan yang baru dimasukkan
-    }
+    randomDeck = []; // Reset deck acak agar menyertakan gambar baru
+    showToast(`✅ ${addedCount} animasi WebP ditambahkan!`);
+    currentIndex = webpList.length - addedCount; // Langsung tampilkan gambar baru
     updatePlayer();
+    startAutoPlayTimer();
   } else {
     showToast("⚠️ Mohon pilih file berformat .webp!");
   }
@@ -676,7 +748,7 @@ function handleFileUpload(event) {
 }
 
 /* ============================================================
-   MODAL GALERI GRID
+   MODAL GALERI GRID RAPI
 ============================================================ */
 function openGalleryModal() {
   const modal = document.getElementById('galleryModal');
@@ -685,7 +757,7 @@ function openGalleryModal() {
   container.innerHTML = '';
 
   if (webpList.length === 0) {
-    container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--text-sub); padding: 40px 0;">Belum ada file WebP yang dimuat.</div>`;
+    container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--text-sub); padding: 50px 0;">Belum ada file WebP yang dimuat.</div>`;
   } else {
     webpList.forEach((item, index) => {
       const card = document.createElement('div');
@@ -697,11 +769,16 @@ function openGalleryModal() {
       img.loading = 'lazy';
       img.alt = item.name;
 
+      const badge = document.createElement('div');
+      badge.className = 'thumb-badge';
+      badge.innerText = `#${index + 1}`;
+
       const title = document.createElement('div');
       title.className = 'thumb-title';
       title.innerText = item.name;
 
       card.appendChild(img);
+      card.appendChild(badge);
       card.appendChild(title);
       container.appendChild(card);
     });
@@ -726,7 +803,7 @@ function updateActiveGridThumbnail() {
 }
 
 /* ============================================================
-   GESER / SWIPE TOUCH GESTURES (PADA HP/TABLET)
+   GESER / SWIPE TOUCH GESTURES (HP & TABLET)
 ============================================================ */
 document.addEventListener('touchstart', (e) => {
   if (e.touches.length === 1) {
@@ -744,12 +821,12 @@ document.addEventListener('touchend', (e) => {
   const deltaX = touchEndX - touchStartX;
   const deltaY = touchEndY - touchStartY;
 
-  // Pastikan gerakan lebih dominan secara horizontal daripada vertikal
+  // Gerakan swipe horizontal yang presisi
   if (Math.abs(deltaX) > 45 && Math.abs(deltaX) > Math.abs(deltaY)) {
     if (deltaX < 0) {
-      nextWebp(); // Usap Kiri -> Selanjutnya
+      nextWebp(); // Geser Kiri -> Selanjutnya
     } else {
-      prevWebp(); // Usap Kanan -> Sebelumnya
+      prevWebp(); // Geser Kanan -> Sebelumnya
     }
   }
 }, { passive: true });
@@ -794,7 +871,7 @@ function showToast(msg) {
   }, 2500);
 }
 
-// Jalankan aplikasi saat dokumen siap
+// Jalankan aplikasi saat halaman siap
 document.addEventListener('DOMContentLoaded', initApp);
 </script>
 
