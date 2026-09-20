@@ -3,25 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Galery Tika - WebP Player & Gallery</title>
+<title>Galery Tika - Premium WebP Player & Gallery</title>
 
 <!-- Google Fonts & FontAwesome Icons -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
 <style>
 :root {
-  --bg-dark: #070a0e;
-  --primary: #00d285;
-  --primary-hover: #00b371;
-  --glass-bg: rgba(13, 20, 29, 0.82);
+  --bg-dark: #05070a;
+  --primary: #00f2fe;
+  --primary-glow: rgba(0, 242, 254, 0.35);
+  --accent: #4facfe;
+  --glass-bg: rgba(10, 15, 26, 0.65);
   --glass-border: rgba(255, 255, 255, 0.12);
-  --glass-card: rgba(22, 32, 45, 0.75);
+  --glass-hover: rgba(255, 255, 255, 0.18);
+  --glass-card: rgba(18, 25, 40, 0.6);
   --text-main: #f8fafc;
   --text-sub: #94a3b8;
-  --accent: #38bdf8;
+  --text-muted: #64748b;
+  --radius-lg: 20px;
+  --radius-md: 14px;
+  --radius-sm: 10px;
+  --transition-fast: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 * {
@@ -43,120 +50,174 @@ html, body {
   position: relative;
 }
 
-/* BACKGROUND FULLSCREEN PLAYER */
-.bg-player {
+/* SYSTEM DUAL BACKGROUND BUFFER UNTUK TRANSISI HALUS */
+.bg-layer {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  z-index: 1;
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
-  transition: background-image 0.6s ease-in-out, background-size 0.3s ease;
+  opacity: 0;
+  transition: opacity 0.8s ease-in-out, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 1;
+  will-change: opacity, transform, background-image;
 }
 
-.bg-player.fit-contain {
+.bg-layer.active {
+  opacity: 1;
+  z-index: 2;
+}
+
+.bg-layer.fit-contain {
   background-size: contain;
 }
 
-/* OVERLAY SHADOW GRADIENT */
-.overlay-gradient {
+/* OVERLAY AMBIENT GRADIENT ELEGANT */
+.overlay-ambient {
   position: absolute;
   inset: 0;
-  z-index: 2;
-  background: linear-gradient(180deg, rgba(7,10,14,0.7) 0%, rgba(7,10,14,0.15) 35%, rgba(7,10,14,0.15) 65%, rgba(7,10,14,0.88) 100%);
+  z-index: 3;
+  background: 
+    radial-gradient(circle at 50% 0%, rgba(0, 242, 254, 0.08) 0%, transparent 60%),
+    linear-gradient(180deg, rgba(5, 7, 10, 0.65) 0%, rgba(5, 7, 10, 0.1) 30%, rgba(5, 7, 10, 0.1) 70%, rgba(5, 7, 10, 0.85) 100%);
   pointer-events: none;
+}
+
+/* PROGRESS BAR AUTOPLAY */
+.autoplay-progress-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.08);
+  z-index: 20;
+}
+
+.autoplay-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--accent), var(--primary));
+  box-shadow: 0 0 10px var(--primary-glow);
+  transition: width 0.1s linear;
 }
 
 /* HEADER NAVBAR */
 .app-header {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
+  top: 12px;
+  left: 16px;
+  right: 16px;
   z-index: 10;
-  padding: 14px 20px;
+  padding: 10px 18px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   background: var(--glass-bg);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  border-bottom: 1px solid var(--glass-border);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  transition: transform var(--transition-fast), opacity var(--transition-fast);
 }
 
 .app-title {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 18px;
+  gap: 12px;
+  font-size: 17px;
   font-weight: 800;
   color: #fff;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.4px;
 }
 
-.app-title i {
+.app-title-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(0,242,254,0.2), rgba(79,172,254,0.1));
+  border: 1px solid rgba(0,242,254,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: var(--primary);
-  font-size: 22px;
+  font-size: 16px;
+  box-shadow: 0 0 15px var(--primary-glow);
 }
 
 .header-tools {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .btn-tool {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--glass-border);
   color: var(--text-main);
   padding: 8px 14px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 8px;
-  transition: all 0.2s ease;
+  transition: all var(--transition-fast);
+  backdrop-filter: blur(8px);
 }
 
-.btn-tool:hover, .btn-tool:active {
-  background: var(--primary);
-  color: #070a0e;
-  border-color: var(--primary);
-  transform: translateY(-1px);
+.btn-tool:hover {
+  background: var(--glass-hover);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+  color: #fff;
+}
+
+.btn-tool:active {
+  transform: translateY(0);
 }
 
 .btn-primary-highlight {
-  background: var(--primary);
-  color: #070a0e;
-  border-color: var(--primary);
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: #05070a;
+  border: none;
   font-weight: 700;
-  box-shadow: 0 0 12px rgba(0,210,133,0.3);
+  box-shadow: 0 4px 15px var(--primary-glow);
 }
 
 .btn-primary-highlight:hover {
-  background: var(--primary-hover);
+  filter: brightness(1.1);
+  color: #000;
+  box-shadow: 0 6px 20px rgba(0, 242, 254, 0.5);
 }
 
 .btn-icon-only {
-  width: 40px;
-  height: 40px;
+  width: 38px;
+  height: 38px;
   padding: 0;
   justify-content: center;
-  border-radius: 50%;
+  border-radius: 12px;
 }
 
-/* NAVIGASI PANAH SWIPE & TOUCH AREA */
+.btn-tool.active-state {
+  background: rgba(0, 242, 254, 0.15);
+  border-color: var(--primary);
+  color: var(--primary);
+  box-shadow: 0 0 12px var(--primary-glow);
+}
+
+/* NAVIGASI TOMBOL SAMPING */
 .nav-arrow {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
   z-index: 5;
-  width: 52px;
-  height: 52px;
+  width: 48px;
+  height: 48px;
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   color: #fff;
@@ -164,54 +225,61 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
+  font-size: 18px;
   cursor: pointer;
-  backdrop-filter: blur(10px);
-  transition: all 0.2s ease;
-  opacity: 0.8;
+  backdrop-filter: blur(16px);
+  transition: all var(--transition-fast);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  opacity: 0.7;
 }
 
 .nav-arrow:hover {
   opacity: 1;
-  background: var(--primary);
-  color: #070a0e;
-  transform: translateY(-50%) scale(1.1);
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: #05070a;
+  border-color: transparent;
+  transform: translateY(-50%) scale(1.12);
+  box-shadow: 0 0 20px var(--primary-glow);
 }
 
 .nav-prev { left: 20px; }
 .nav-next { right: 20px; }
 
-/* FOOTER BAR INFORMASI & KONTROL */
+/* FOOTER BAR */
 .app-footer {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  bottom: 12px;
+  left: 16px;
+  right: 16px;
   z-index: 10;
-  padding: 14px 20px;
+  padding: 10px 18px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   background: var(--glass-bg);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  border-top: 1px solid var(--glass-border);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  transition: transform var(--transition-fast), opacity var(--transition-fast);
 }
 
 .info-box {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  max-width: 60%;
 }
 
 .file-name-text {
   font-size: 14px;
   font-weight: 700;
   color: #fff;
-  max-width: 260px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  letter-spacing: 0.2px;
 }
 
 .counter-badge {
@@ -223,68 +291,146 @@ html, body {
   gap: 6px;
 }
 
-/* MODAL DRAWER GALERI GRID RAPI */
+.scan-status-pill {
+  font-size: 11px;
+  color: var(--text-sub);
+  background: rgba(255, 255, 255, 0.08);
+  padding: 2px 8px;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.scan-status-pill .pulse-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--primary);
+  border-radius: 50%;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 242, 254, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(0, 242, 254, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 242, 254, 0); }
+}
+
+/* MODAL GALERI GRID PREMIUM */
 .modal-gallery {
   position: fixed;
   inset: 0;
   z-index: 100;
-  background: rgba(7, 10, 14, 0.92);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  background: rgba(5, 7, 10, 0.88);
+  backdrop-filter: blur(28px) saturate(200%);
+  -webkit-backdrop-filter: blur(28px) saturate(200%);
   display: none;
   flex-direction: column;
   padding: 20px;
-  animation: fadeIn 0.25s ease-out;
+  animation: modalFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .modal-gallery.show {
   display: flex;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
+@keyframes modalFadeIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 .gallery-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
   padding-bottom: 14px;
   border-bottom: 1px solid var(--glass-border);
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.gallery-title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.gallery-title-group h2 {
+  font-size: 18px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.gallery-search-box {
+  position: relative;
+  flex: 1;
+  max-width: 320px;
+}
+
+.gallery-search-box input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: 8px 12px 8px 36px;
+  color: #fff;
+  font-size: 13px;
+  outline: none;
+  transition: all var(--transition-fast);
+}
+
+.gallery-search-box input:focus {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--primary);
+  box-shadow: 0 0 12px var(--primary-glow);
+}
+
+.gallery-search-box i {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-sub);
+  font-size: 13px;
 }
 
 .gallery-grid {
   flex: 1;
   overflow-y: auto;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
   gap: 14px;
-  padding-right: 4px;
+  padding-right: 6px;
   align-content: start;
 }
+
+.gallery-grid::-webkit-scrollbar { width: 6px; }
+.gallery-grid::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.02); border-radius: 10px; }
+.gallery-grid::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 10px; }
+.gallery-grid::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
 .thumb-card {
   position: relative;
   aspect-ratio: 1 / 1;
   background: var(--glass-card);
-  border: 2px solid transparent;
-  border-radius: 14px;
+  border: 1.5px solid var(--glass-border);
+  border-radius: var(--radius-md);
   overflow: hidden;
   cursor: pointer;
-  transition: all 0.22s ease;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  transition: all var(--transition-fast);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
 }
 
 .thumb-card:hover {
-  transform: translateY(-3px) scale(1.02);
+  transform: translateY(-4px) scale(1.02);
   border-color: var(--accent);
+  box-shadow: 0 10px 25px rgba(79, 172, 254, 0.3);
 }
 
 .thumb-card.active {
   border-color: var(--primary);
-  box-shadow: 0 0 18px rgba(0,210,133,0.5);
+  box-shadow: 0 0 20px var(--primary-glow);
 }
 
 .thumb-card img {
@@ -292,60 +438,55 @@ html, body {
   height: 100%;
   object-fit: cover;
   display: block;
+  transition: transform 0.4s ease;
+}
+
+.thumb-card:hover img {
+  transform: scale(1.08);
 }
 
 .thumb-card .thumb-badge {
   position: absolute;
   top: 6px;
   left: 6px;
-  background: rgba(7, 10, 14, 0.75);
+  background: rgba(5, 7, 10, 0.82);
   color: var(--primary);
   font-size: 10px;
-  font-weight: 700;
-  padding: 2px 6px;
+  font-weight: 800;
+  padding: 3px 7px;
   border-radius: 6px;
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,0.1);
 }
 
 .thumb-card .thumb-title {
   position: absolute;
   bottom: 0;
   inset-x: 0;
-  background: linear-gradient(180deg, transparent, rgba(0,0,0,0.9));
+  background: linear-gradient(180deg, transparent 0%, rgba(5, 7, 10, 0.95) 100%);
   font-size: 11px;
   font-weight: 600;
-  padding: 8px 8px 6px;
+  padding: 12px 8px 6px;
   color: #fff;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* LOADING & EMPTY STATE */
-.loading-box {
-  position: absolute;
-  inset: 0;
-  z-index: 20;
+.empty-gallery-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-sub);
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 14px;
-  background: var(--bg-dark);
-  color: var(--text-sub);
+  gap: 12px;
 }
 
-.spinner {
-  width: 38px;
-  height: 38px;
-  border: 3px solid rgba(255,255,255,0.1);
-  border-top-color: var(--primary);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
+.empty-gallery-state i {
+  font-size: 40px;
+  color: var(--text-muted);
 }
 
 /* TOAST NOTIFIKASI */
@@ -354,18 +495,22 @@ html, body {
   bottom: 80px;
   left: 50%;
   transform: translateX(-50%) translateY(50px);
-  background: #1e293b;
+  background: rgba(15, 23, 42, 0.9);
   border: 1px solid var(--glass-border);
+  backdrop-filter: blur(16px);
   color: #fff;
-  padding: 10px 20px;
-  border-radius: 20px;
+  padding: 10px 22px;
+  border-radius: 30px;
   font-size: 13px;
   font-weight: 600;
   z-index: 200;
   opacity: 0;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   pointer-events: none;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 15px var(--primary-glow);
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 #toast.show {
@@ -373,94 +518,135 @@ html, body {
   transform: translateX(-50%) translateY(0);
 }
 
-@media (max-width: 600px) {
-  .app-header, .app-footer { padding: 12px 14px; }
+/* TAMPILAN BERSIH (HIDE UI) */
+.ui-hidden .app-header,
+.ui-hidden .app-footer,
+.ui-hidden .nav-arrow,
+.ui-hidden .autoplay-progress-container {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* LAYOUT MOBILE */
+@media (max-width: 640px) {
+  .app-header, .app-footer {
+    padding: 8px 12px;
+    left: 10px;
+    right: 10px;
+  }
+  .app-header { top: 10px; }
+  .app-footer { bottom: 10px; }
   .btn-tool span { display: none; }
-  .nav-arrow { width: 44px; height: 44px; font-size: 16px; }
+  .nav-arrow { width: 42px; height: 42px; font-size: 16px; }
   .nav-prev { left: 10px; }
   .nav-next { right: 10px; }
-  .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(105px, 1fr)); gap: 10px; }
+  .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
+  .info-box { max-width: 65%; }
+  .file-name-text { font-size: 13px; }
 }
 </style>
 </head>
 
 <body>
 
-<!-- LOADING SCREEN -->
-<div class="loading-box" id="loadingBox">
-  <div class="spinner"></div>
-  <div style="font-size: 14px; font-weight: 600;">Memindai koleksi WebP...</div>
-</div>
+<!-- DUAL LAYER BACKGROUND UNTUK CROSS-FADE HALUS -->
+<div class="bg-layer active" id="bgLayerA"></div>
+<div class="bg-layer" id="bgLayerB"></div>
+<div class="overlay-ambient"></div>
 
-<!-- BACKGROUND ANIMATION PLAYER -->
-<div class="bg-player" id="bgPlayer"></div>
-<div class="overlay-gradient"></div>
+<!-- BAR PROGRESS ROTASI AUTOPLAY -->
+<div class="autoplay-progress-container">
+  <div class="autoplay-progress-bar" id="progressBar"></div>
+</div>
 
 <!-- HEADER BAR -->
 <header class="app-header">
   <div class="app-title">
-    <i class="fa-solid fa-circle-play"></i>
+    <div class="app-title-icon">
+      <i class="fa-solid fa-wand-magic-sparkles"></i>
+    </div>
     <span>Galery Tika</span>
   </div>
 
   <div class="header-tools">
-    <!-- TOMBOL UTAMA BUKAI GALERI GRID -->
-    <button class="btn-tool btn-primary-highlight" onclick="openGalleryModal()" title="Buka Kumpulan Galeri">
+    <!-- TOMBOL UTAMA BUKA GALERI GRID -->
+    <button class="btn-tool btn-primary-highlight" onclick="openGalleryModal()" title="Buka Koleksi Galeri">
       <i class="fa-solid fa-border-all"></i>
       <span>Galeri</span>
     </button>
 
+    <!-- PINDAI ULANG FOLDER -->
+    <button class="btn-tool" onclick="rescanFolder()" title="Pindai Ulang WebP">
+      <i class="fa-solid fa-arrows-rotate"></i>
+      <span>Pindai</span>
+    </button>
+
     <!-- UPLOAD FILE WEBP LOKAL -->
-    <button class="btn-tool" onclick="document.getElementById('fileInput').click()" title="Tambah / Upload File WebP">
+    <button class="btn-tool" onclick="document.getElementById('fileInput').click()" title="Upload File WebP">
       <i class="fa-solid fa-folder-plus"></i>
       <span>Upload</span>
     </button>
     <input type="file" id="fileInput" accept="image/webp" multiple style="display: none;" onchange="handleFileUpload(event)">
 
     <!-- TAMPILAN MODE (COVER / CONTAIN) -->
-    <button class="btn-tool btn-icon-only" id="btnFitMode" onclick="toggleFitMode()" title="Ubah Mode Tampilan (Ukuran Utuh / Penuh)">
+    <button class="btn-tool btn-icon-only" id="btnFitMode" onclick="toggleFitMode()" title="Mode Ukuran (Fit / Fill)">
       <i class="fa-solid fa-expand"></i>
     </button>
 
     <!-- ROTASI OTOMATIS PAUSE/PLAY -->
-    <button class="btn-tool btn-icon-only" id="btnAutoPlay" onclick="toggleAutoPlay()" title="Putar Otomatis 20 Detik (Random)">
+    <button class="btn-tool btn-icon-only active-state" id="btnAutoPlay" onclick="toggleAutoPlay()" title="Auto-Play 20s (Random)">
       <i class="fa-solid fa-shuffle"></i>
     </button>
   </div>
 </header>
 
-<!-- NAVIGASI TOMBOL SAMPING -->
-<button class="nav-arrow nav-prev" onclick="prevWebp()" title="Animasi Sebelumnya">
+<!-- NAVIGASI PANAH -->
+<button class="nav-arrow nav-prev" onclick="prevWebp()" title="Sebelumnya">
   <i class="fa-solid fa-chevron-left"></i>
 </button>
 
-<button class="nav-arrow nav-next" onclick="nextWebp()" title="Animasi Selanjutnya">
+<button class="nav-arrow nav-next" onclick="nextWebp()" title="Selanjutnya">
   <i class="fa-solid fa-chevron-right"></i>
 </button>
 
-<!-- FOOTER BAR INFORMASI -->
+<!-- FOOTER BAR -->
 <footer class="app-footer">
   <div class="info-box">
-    <div class="file-name-text" id="fileNameText">Memuat...</div>
-    <div class="counter-badge" id="counterText">
-      <i class="fa-solid fa-clock-rotate-left"></i> 0 / 0 WebP (20s Random)
+    <div class="file-name-text" id="fileNameText">Memuat gambar...</div>
+    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+      <div class="counter-badge" id="counterText">
+        <i class="fa-solid fa-layer-group"></i> 0 / 0 WebP
+      </div>
+      <div class="scan-status-pill" id="scanStatusPill" style="display: none;">
+        <span class="pulse-dot"></span>
+        <span id="scanStatusText">Memindai folder...</span>
+      </div>
     </div>
   </div>
 
   <div style="display: flex; gap: 8px;">
+    <button class="btn-tool btn-icon-only" onclick="toggleCleanUI()" title="Sembunyikan UI">
+      <i class="fa-solid fa-eye-slash"></i>
+    </button>
     <button class="btn-tool btn-icon-only" onclick="toggleFullscreen()" title="Layar Penuh">
-      <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
+      <i class="fa-solid fa-expand"></i>
     </button>
   </div>
 </footer>
 
-<!-- MODAL GALERI GRID RAPI -->
+<!-- MODAL GALERI GRID PREMIUM -->
 <div class="modal-gallery" id="galleryModal">
   <div class="gallery-header">
-    <div style="display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 700;">
-      <i class="fa-solid fa-images" style="color: var(--primary);"></i>
-      <span>Koleksi Animasi Galery Tika</span>
+    <div class="gallery-title-group">
+      <i class="fa-solid fa-photo-film" style="color: var(--primary); font-size: 20px;"></i>
+      <h2>Koleksi WebP Galery Tika</h2>
     </div>
+
+    <div class="gallery-search-box">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" id="gallerySearch" placeholder="Cari nama file WebP..." oninput="filterGalleryGrid()">
+    </div>
+
     <button class="btn-tool btn-icon-only" onclick="closeGalleryModal()">
       <i class="fa-solid fa-xmark"></i>
     </button>
@@ -472,39 +658,325 @@ html, body {
 </div>
 
 <!-- TOAST NOTIFIKASI -->
-<div id="toast">Notifikasi</div>
+<div id="toast">
+  <i class="fa-solid fa-circle-info" style="color: var(--primary);"></i>
+  <span id="toastMsg">Notifikasi</span>
+</div>
 
 <script>
 /* ============================================================
-   GLOBAL VARIABLES & STATE MANAGEMENT
+   GLOBAL STATE & STORAGE MANAGEMENT
 ============================================================ */
-let webpList = [];              // Daftar URL / Path file WebP
-let currentIndex = 0;           // Index file WebP yang sedang tayang
-let isFitContain = false;       // Mode ukuran gambar (Cover vs Contain)
-let isAutoPlay = true;          // Status rotasi acak otomatis (Default: AKTIF)
-let autoPlayTimer = null;       // Interval timer rotasi
-const AUTO_PLAY_DELAY_MS = 20000; // ROTASI 20 DETIK
-let randomDeck = [];            // Deck untuk acak tanpa pengulangan langsung
+let webpList = [];              // Array object: { name, url, isBlob }
+let currentIndex = 0;           // Index file aktif
+let activeLayer = 'A';          // Modern Dual-Layer rendering ('A' or 'B')
+let isFitContain = false;       // Fit Mode: false (Cover) / true (Contain)
+let isAutoPlay = true;          // Rotasi otomatis (Default: true)
+let autoPlayTimer = null;       // Interval timer
+let progressTimer = null;       // Progress bar timer
+const AUTO_PLAY_DELAY_MS = 20000; // 20 Detik
+let progressStartTime = 0;
+let randomDeck = [];            // Random deck tanpa pengulangan langsung
+let isUIHidden = false;         // UI clean view toggle
 
 /* Touch / Swipe Gestures */
 let touchStartX = 0;
 let touchStartY = 0;
+let touchTimeStart = 0;
+
+/* Cache key local storage */
+const CACHE_KEY = 'galery_tika_webp_cache_v2';
 
 /* ============================================================
-   ROTASI RANDOM & SHUFFLE DECK LOGIC
+   INISIALISASI CEPAT TANPA DELAY & PEMINDAIAN LATAR BELAKANG
 ============================================================ */
+document.addEventListener('DOMContentLoaded', async () => {
+  // 1. Muat Cache File Terakhir untuk Tampilan Instan < 10ms
+  loadFromCache();
+
+  // 2. Langsung tampilkan gambar latar jika ada di cache
+  if (webpList.length > 0) {
+    currentIndex = Math.floor(Math.random() * webpList.length);
+    updatePlayer(false);
+  }
+
+  // 3. Jalankan pemindaian folder di latar belakang tanpa memblokir layar
+  startBackgroundScanner();
+
+  // 4. Jalankan Timer Autoplay
+  if (isAutoPlay) startAutoPlayTimer();
+});
+
+function loadFromCache() {
+  try {
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        webpList = parsed.map(f => ({ name: f.name, url: f.url, isBlob: false }));
+      }
+    }
+  } catch (e) {}
+}
+
+function saveToCache() {
+  try {
+    const toSave = webpList.filter(item => !item.isBlob).map(item => ({
+      name: item.name,
+      url: item.url
+    }));
+    localStorage.setItem(CACHE_KEY, JSON.stringify(toSave));
+  } catch (e) {}
+}
+
+/* ============================================================
+   PEMINDAIAN MULTI-METODE DETEKSI FILE WEBP
+============================================================ */
+async function startBackgroundScanner() {
+  showScanPill(true, "Memindai folder...");
+  const discovered = new Set();
+
+  webpList.forEach(item => discovered.add(item.url));
+
+  // Metode A: Indeks Folder Server (Apache, Nginx, Caddy, LiveServer)
+  try {
+    const res = await fetch('./', { cache: 'no-cache' });
+    if (res.ok) {
+      const htmlText = await res.text();
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(htmlText, 'text/html');
+      const links = doc.querySelectorAll('a[href]');
+
+      links.forEach(link => {
+        let href = link.getAttribute('href');
+        if (href) {
+          href = href.trim();
+          if (href.toLowerCase().endsWith('.webp') && !href.startsWith('http://') && !href.startsWith('https://')) {
+            discovered.add(decodeURIComponent(href));
+          }
+        }
+      });
+    }
+  } catch (err) {}
+
+  // Metode B: Manifest File JSON (list.json, files.json, manifest.json)
+  const jsonFiles = ['list.json', 'files.json', 'webp_list.json', 'manifest.json'];
+  for (const jFile of jsonFiles) {
+    try {
+      const resJson = await fetch(jFile, { cache: 'no-cache' });
+      if (resJson.ok) {
+        const data = await resJson.json();
+        if (Array.isArray(data)) {
+          data.forEach(f => {
+            if (typeof f === 'string' && f.toLowerCase().endsWith('.webp')) {
+              discovered.add(f);
+            } else if (f && f.url && f.url.toLowerCase().endsWith('.webp')) {
+              discovered.add(f.url);
+            }
+          });
+        }
+      }
+    } catch(e) {}
+  }
+
+  // Metode C: Pemindaian Paralel Rentang Pola Nama File
+  const candidateUrls = [];
+  const prefixes = ['', 'bg', 'anim', 'tika', 'photo', 'img', 'image', 'pic'];
+  
+  for (let i = 1; i <= 200; i++) {
+    const pad2 = String(i).padStart(2, '0');
+    const pad3 = String(i).padStart(3, '0');
+    
+    prefixes.forEach(p => {
+      candidateUrls.push(`${p}${i}.webp`);
+      if (i < 100) candidateUrls.push(`${p}${pad2}.webp`);
+      if (i < 1000) candidateUrls.push(`${p}${pad3}.webp`);
+    });
+  }
+
+  const batchSize = 30;
+  for (let i = 0; i < candidateUrls.length; i += batchSize) {
+    const batch = candidateUrls.slice(i, i + batchSize);
+    const results = await Promise.all(batch.map(probeImage));
+    
+    let newlyFound = false;
+    results.forEach(url => {
+      if (url && !discovered.has(url)) {
+        discovered.add(url);
+        newlyFound = true;
+      }
+    });
+
+    if (newlyFound && webpList.length === 0) {
+      updateWebpListFromSet(discovered);
+      currentIndex = 0;
+      updatePlayer(false);
+    }
+  }
+
+  updateWebpListFromSet(discovered);
+  saveToCache();
+  showScanPill(false);
+
+  if (webpList.length === 0) {
+    document.getElementById('fileNameText').innerText = "Belum Ada File WebP";
+    document.getElementById('counterText').innerText = "0 / 0 WebP";
+    showToast("⚠️ Tidak ada file .webp ditemukan. Silakan Upload!");
+  } else {
+    if (!document.getElementById('bgLayerA').style.backgroundImage && !document.getElementById('bgLayerB').style.backgroundImage) {
+      currentIndex = Math.floor(Math.random() * webpList.length);
+      updatePlayer(false);
+    }
+    updateCounterText();
+  }
+}
+
+function probeImage(url) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => resolve(url);
+    img.onerror = () => resolve(null);
+    img.src = url;
+  });
+}
+
+function updateWebpListFromSet(fileSet) {
+  const newArray = [];
+  fileSet.forEach(url => {
+    const existing = webpList.find(item => item.url === url);
+    if (existing) {
+      newArray.push(existing);
+    } else {
+      newArray.push({
+        name: extractFileName(url),
+        url: url,
+        isBlob: url.startsWith('blob:')
+      });
+    }
+  });
+
+  webpList = newArray;
+  updateCounterText();
+  preloadAdjacentImages();
+}
+
+function rescanFolder() {
+  showToast("🔄 Memindai ulang folder...");
+  startBackgroundScanner();
+}
+
+function showScanPill(show, text = "") {
+  const pill = document.getElementById('scanStatusPill');
+  const txt = document.getElementById('scanStatusText');
+  if (show) {
+    txt.innerText = text;
+    pill.style.display = 'inline-flex';
+  } else {
+    pill.style.display = 'none';
+  }
+}
+
+/* ============================================================
+   LOGIKA PEMUTAR DUAL-BUFFER (CROSS-FADE)
+============================================================ */
+function updatePlayer(animate = true) {
+  if (webpList.length === 0) return;
+
+  const currentItem = webpList[currentIndex];
+  const layerA = document.getElementById('bgLayerA');
+  const layerB = document.getElementById('bgLayerB');
+
+  const nextBgUrl = `url("${currentItem.url}")`;
+
+  if (activeLayer === 'A') {
+    layerB.style.backgroundImage = nextBgUrl;
+    if (isFitContain) layerB.classList.add('fit-contain'); else layerB.classList.remove('fit-contain');
+    
+    if (animate) {
+      layerB.classList.add('active');
+      layerA.classList.remove('active');
+    } else {
+      layerB.style.transition = 'none';
+      layerB.classList.add('active');
+      layerA.classList.remove('active');
+      setTimeout(() => layerB.style.transition = '', 50);
+    }
+    activeLayer = 'B';
+  } else {
+    layerA.style.backgroundImage = nextBgUrl;
+    if (isFitContain) layerA.classList.add('fit-contain'); else layerA.classList.remove('fit-contain');
+    
+    if (animate) {
+      layerA.classList.add('active');
+      layerB.classList.remove('active');
+    } else {
+      layerA.style.transition = 'none';
+      layerA.classList.add('active');
+      layerB.classList.remove('active');
+      setTimeout(() => layerA.style.transition = '', 50);
+    }
+    activeLayer = 'A';
+  }
+
+  document.getElementById('fileNameText').innerText = currentItem.name;
+  updateCounterText();
+  updateActiveGridThumbnail();
+  preloadAdjacentImages();
+}
+
+function updateCounterText() {
+  const counter = document.getElementById('counterText');
+  counter.innerHTML = `<i class="fa-solid fa-layer-group"></i> ${currentIndex + 1} / ${webpList.length} WebP`;
+}
+
+function preloadAdjacentImages() {
+  if (webpList.length <= 1) return;
+  const nextIdx = (currentIndex + 1) % webpList.length;
+  const prevIdx = (currentIndex - 1 + webpList.length) % webpList.length;
+
+  const imgNext = new Image();
+  imgNext.src = webpList[nextIdx].url;
+
+  const imgPrev = new Image();
+  imgPrev.src = webpList[prevIdx].url;
+}
+
+/* ============================================================
+   NAVIGASI & ROTASI OTOMATIS
+============================================================ */
+function nextWebp() {
+  if (webpList.length === 0) return;
+  currentIndex = getNextRandomIndex();
+  updatePlayer();
+  if (isAutoPlay) startAutoPlayTimer();
+}
+
+function prevWebp() {
+  if (webpList.length === 0) return;
+  currentIndex = (currentIndex - 1 + webpList.length) % webpList.length;
+  updatePlayer();
+  if (isAutoPlay) startAutoPlayTimer();
+}
+
+function selectWebp(index) {
+  if (index >= 0 && index < webpList.length) {
+    currentIndex = index;
+    updatePlayer();
+    closeGalleryModal();
+    if (isAutoPlay) startAutoPlayTimer();
+    showToast(`▶️ Memutar: ${webpList[index].name}`);
+  }
+}
+
 function getNextRandomIndex() {
   if (webpList.length <= 1) return 0;
 
   if (randomDeck.length === 0) {
-    // Isi deck dengan semua index yang ada
     randomDeck = Array.from({ length: webpList.length }, (_, i) => i);
-    // Acak deck (Fisher-Yates Shuffle)
     for (let i = randomDeck.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [randomDeck[i], randomDeck[j]] = [randomDeck[j], randomDeck[i]];
     }
-    // Jika elemen pertama sama dengan yang sedang aktif, tukar agar tidak berulang beruntun
     if (randomDeck[randomDeck.length - 1] === currentIndex) {
       const temp = randomDeck[randomDeck.length - 1];
       randomDeck[randomDeck.length - 1] = randomDeck[0];
@@ -517,186 +989,29 @@ function getNextRandomIndex() {
 
 function startAutoPlayTimer() {
   stopAutoPlayTimer();
-  if (isAutoPlay) {
-    autoPlayTimer = setInterval(() => {
-      if (webpList.length > 1) {
-        currentIndex = getNextRandomIndex();
-        updatePlayer();
-      }
-    }, AUTO_PLAY_DELAY_MS);
-  }
+  progressStartTime = Date.now();
+  
+  progressTimer = setInterval(() => {
+    const elapsed = Date.now() - progressStartTime;
+    const percent = Math.min(100, (elapsed / AUTO_PLAY_DELAY_MS) * 100);
+    document.getElementById('progressBar').style.width = percent + '%';
+  }, 100);
+
+  autoPlayTimer = setInterval(() => {
+    if (webpList.length > 1) {
+      currentIndex = getNextRandomIndex();
+      updatePlayer();
+      progressStartTime = Date.now();
+    }
+  }, AUTO_PLAY_DELAY_MS);
 }
 
 function stopAutoPlayTimer() {
-  if (autoPlayTimer) {
-    clearInterval(autoPlayTimer);
-    autoPlayTimer = null;
-  }
-}
-
-/* ============================================================
-   DETEKSI & PEMINDAIAN FILE WEBP AUTOMATIC
-============================================================ */
-async function scanDirectoryForWebp() {
-  const foundFiles = new Set();
-
-  // 1. Pindai direktori root server
-  try {
-    const response = await fetch('./', { cache: 'no-cache' });
-    if (response.ok) {
-      const htmlText = await response.text();
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(htmlText, 'text/html');
-      const links = doc.querySelectorAll('a[href]');
-
-      links.forEach(link => {
-        const href = link.getAttribute('href');
-        if (href && href.toLowerCase().endsWith('.webp')) {
-          foundFiles.add(decodeURIComponent(href));
-        }
-      });
-    }
-  } catch (err) {}
-
-  // 2. Pembacaan list.json jika ada
-  if (foundFiles.size === 0) {
-    try {
-      const resJson = await fetch('list.json');
-      if (resJson.ok) {
-        const jsonList = await resJson.json();
-        if (Array.isArray(jsonList)) {
-          jsonList.forEach(f => {
-            if (f.toLowerCase().endsWith('.webp')) foundFiles.add(f);
-          });
-        }
-      }
-    } catch(e) {}
-  }
-
-  // 3. Fallback Probing Luas (Angka, bg, anim, tika, photo)
-  if (foundFiles.size === 0) {
-    const probeCandidates = [];
-    for (let i = 1; i <= 150; i++) {
-      probeCandidates.push(`${i}.webp`);
-      probeCandidates.push(`bg${String(i).padStart(3, '0')}.webp`);
-      probeCandidates.push(`bg${i}.webp`);
-      probeCandidates.push(`anim${i}.webp`);
-      probeCandidates.push(`tika${i}.webp`);
-      probeCandidates.push(`photo${i}.webp`);
-    }
-
-    const probePromise = (url) => new Promise(resolve => {
-      const img = new Image();
-      img.onload = () => resolve(url);
-      img.onerror = () => resolve(null);
-      img.src = url;
-    });
-
-    const batchResults = await Promise.all(probeCandidates.map(probePromise));
-    batchResults.filter(Boolean).forEach(url => foundFiles.add(url));
-  }
-
-  return Array.from(foundFiles);
-}
-
-/* ============================================================
-   INISIALISASI APLIKASI
-============================================================ */
-async function initApp() {
-  showLoading(true);
-  const detectedFiles = await scanDirectoryForWebp();
-
-  if (detectedFiles.length > 0) {
-    webpList = detectedFiles.map(file => ({
-      name: extractFileName(file),
-      url: file
-    }));
-  } else {
-    showToast("⚠️ Belum ada file .webp di folder. Silakan klik 'Upload'!");
-  }
-
-  showLoading(false);
-
-  if (webpList.length > 0) {
-    currentIndex = Math.floor(Math.random() * webpList.length); // Putar acak pertama kali
-    updatePlayer();
-    startAutoPlayTimer();
-  } else {
-    document.getElementById('fileNameText').innerText = "Belum Ada File WebP";
-    document.getElementById('counterText').innerText = "0 / 0 WebP";
-  }
-}
-
-function extractFileName(pathOrUrl) {
-  try {
-    const clean = pathOrUrl.split('?')[0].split('#')[0];
-    return clean.substring(clean.lastIndexOf('/') + 1);
-  } catch (e) {
-    return pathOrUrl;
-  }
-}
-
-/* ============================================================
-   KONTROL PEMUTAR & TAMPILAN
-============================================================ */
-function updatePlayer() {
-  if (webpList.length === 0) return;
-
-  const currentItem = webpList[currentIndex];
-  const bgPlayer = document.getElementById('bgPlayer');
-  
-  // Tampilkan gambar WebP penuh
-  bgPlayer.style.backgroundImage = `url('${currentItem.url}')`;
-
-  // Update Teks Informasi Footer
-  document.getElementById('fileNameText').innerText = currentItem.name;
-  document.getElementById('counterText').innerHTML = `<i class="fa-solid fa-clock-rotate-left"></i> ${currentIndex + 1} / ${webpList.length} WebP (20s Random)`;
-
-  // Tandai gambar aktif jika galeri terbuka
-  updateActiveGridThumbnail();
-}
-
-function nextWebp() {
-  if (webpList.length === 0) return;
-  currentIndex = (currentIndex + 1) % webpList.length;
-  updatePlayer();
-  startAutoPlayTimer(); // Reset timer 20 detik setelah interaksi manual
-}
-
-function prevWebp() {
-  if (webpList.length === 0) return;
-  currentIndex = (currentIndex - 1 + webpList.length) % webpList.length;
-  updatePlayer();
-  startAutoPlayTimer(); // Reset timer 20 detik setelah interaksi manual
-}
-
-function selectWebp(index) {
-  if (index >= 0 && index < webpList.length) {
-    currentIndex = index;
-    updatePlayer();
-    closeGalleryModal();
-    startAutoPlayTimer(); // Reset timer 20 detik
-    showToast(`▶️ Memutar: ${webpList[index].name}`);
-  }
-}
-
-/* ============================================================
-   KONTROL MODE UKURAN & AUTO-PLAY ROTASI
-============================================================ */
-function toggleFitMode() {
-  isFitContain = !isFitContain;
-  const bgPlayer = document.getElementById('bgPlayer');
-  const btn = document.getElementById('btnFitMode');
-
-  if (isFitContain) {
-    bgPlayer.classList.add('fit-contain');
-    btn.style.color = 'var(--primary)';
-    showToast('🖼️ Mode Gambar Utuh (Contain)');
-  } else {
-    bgPlayer.classList.remove('fit-contain');
-    btn.style.color = 'var(--text-main)';
-    showToast('📐 Mode Layar Penuh (Cover)');
-  }
+  if (autoPlayTimer) clearInterval(autoPlayTimer);
+  if (progressTimer) clearInterval(progressTimer);
+  autoPlayTimer = null;
+  progressTimer = null;
+  document.getElementById('progressBar').style.width = '0%';
 }
 
 function toggleAutoPlay() {
@@ -704,18 +1019,37 @@ function toggleAutoPlay() {
   const btn = document.getElementById('btnAutoPlay');
 
   if (isAutoPlay) {
-    btn.style.color = 'var(--primary)';
+    btn.classList.add('active-state');
     startAutoPlayTimer();
-    showToast('🔄 Rotasi Otomatis 20s Aktif (Random)');
+    showToast('🔄 Rotasi Otomatis 20s Aktif');
   } else {
-    btn.style.color = 'var(--text-main)';
+    btn.classList.remove('active-state');
     stopAutoPlayTimer();
     showToast('⏸️ Rotasi Otomatis Dihentikan');
   }
 }
 
+function toggleFitMode() {
+  isFitContain = !isFitContain;
+  const layerA = document.getElementById('bgLayerA');
+  const layerB = document.getElementById('bgLayerB');
+  const btn = document.getElementById('btnFitMode');
+
+  if (isFitContain) {
+    layerA.classList.add('fit-contain');
+    layerB.classList.add('fit-contain');
+    btn.classList.add('active-state');
+    showToast('🖼️ Mode Ukuran Utuh (Contain)');
+  } else {
+    layerA.classList.remove('fit-contain');
+    layerB.classList.remove('fit-contain');
+    btn.classList.remove('active-state');
+    showToast('📐 Mode Layar Penuh (Cover)');
+  }
+}
+
 /* ============================================================
-   UPLOAD LANGSUNG FILE WEBP
+   UPLOAD FILE LOKAL
 ============================================================ */
 function handleFileUpload(event) {
   const files = Array.from(event.target.files);
@@ -728,62 +1062,33 @@ function handleFileUpload(event) {
       const objectUrl = URL.createObjectURL(file);
       webpList.push({
         name: file.name,
-        url: objectUrl
+        url: objectUrl,
+        isBlob: true
       });
       addedCount++;
     }
   });
 
   if (addedCount > 0) {
-    randomDeck = []; // Reset deck acak agar menyertakan gambar baru
-    showToast(`✅ ${addedCount} animasi WebP ditambahkan!`);
-    currentIndex = webpList.length - addedCount; // Langsung tampilkan gambar baru
+    randomDeck = [];
+    showToast(`✅ ${addedCount} file WebP ditambahkan!`);
+    currentIndex = webpList.length - addedCount;
     updatePlayer();
-    startAutoPlayTimer();
+    if (isAutoPlay) startAutoPlayTimer();
   } else {
-    showToast("⚠️ Mohon pilih file berformat .webp!");
+    showToast("⚠️ Harap pilih file berformat .webp!");
   }
 
   event.target.value = '';
 }
 
 /* ============================================================
-   MODAL GALERI GRID RAPI
+   MODAL GALERI GRID & SEARCH
 ============================================================ */
 function openGalleryModal() {
   const modal = document.getElementById('galleryModal');
-  const container = document.getElementById('galleryGridContainer');
-  
-  container.innerHTML = '';
-
-  if (webpList.length === 0) {
-    container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--text-sub); padding: 50px 0;">Belum ada file WebP yang dimuat.</div>`;
-  } else {
-    webpList.forEach((item, index) => {
-      const card = document.createElement('div');
-      card.className = `thumb-card ${index === currentIndex ? 'active' : ''}`;
-      card.onclick = () => selectWebp(index);
-
-      const img = document.createElement('img');
-      img.src = item.url;
-      img.loading = 'lazy';
-      img.alt = item.name;
-
-      const badge = document.createElement('div');
-      badge.className = 'thumb-badge';
-      badge.innerText = `#${index + 1}`;
-
-      const title = document.createElement('div');
-      title.className = 'thumb-title';
-      title.innerText = item.name;
-
-      card.appendChild(img);
-      card.appendChild(badge);
-      card.appendChild(title);
-      container.appendChild(card);
-    });
-  }
-
+  document.getElementById('gallerySearch').value = '';
+  renderGalleryGrid(webpList);
   modal.classList.add('show');
 }
 
@@ -791,9 +1096,57 @@ function closeGalleryModal() {
   document.getElementById('galleryModal').classList.remove('show');
 }
 
+function filterGalleryGrid() {
+  const query = document.getElementById('gallerySearch').value.toLowerCase().trim();
+  const filtered = webpList.filter(item => item.name.toLowerCase().includes(query));
+  renderGalleryGrid(filtered);
+}
+
+function renderGalleryGrid(listToRender) {
+  const container = document.getElementById('galleryGridContainer');
+  container.innerHTML = '';
+
+  if (listToRender.length === 0) {
+    container.innerHTML = `
+      <div class="empty-gallery-state">
+        <i class="fa-regular fa-folder-open"></i>
+        <div>Tidak ada file WebP yang sesuai.</div>
+      </div>
+    `;
+    return;
+  }
+
+  listToRender.forEach((item) => {
+    const origIndex = webpList.indexOf(item);
+    const card = document.createElement('div');
+    card.className = `thumb-card ${origIndex === currentIndex ? 'active' : ''}`;
+    card.setAttribute('data-index', origIndex);
+    card.onclick = () => selectWebp(origIndex);
+
+    const img = document.createElement('img');
+    img.src = item.url;
+    img.loading = 'lazy';
+    img.alt = item.name;
+
+    const badge = document.createElement('div');
+    badge.className = 'thumb-badge';
+    badge.innerText = `#${origIndex + 1}`;
+
+    const title = document.createElement('div');
+    title.className = 'thumb-title';
+    title.innerText = item.name;
+
+    card.appendChild(img);
+    card.appendChild(badge);
+    card.appendChild(title);
+    container.appendChild(card);
+  });
+}
+
 function updateActiveGridThumbnail() {
   const cards = document.querySelectorAll('.thumb-card');
-  cards.forEach((card, idx) => {
+  cards.forEach(card => {
+    const idx = parseInt(card.getAttribute('data-index'));
     if (idx === currentIndex) {
       card.classList.add('active');
     } else {
@@ -803,52 +1156,25 @@ function updateActiveGridThumbnail() {
 }
 
 /* ============================================================
-   GESER / SWIPE TOUCH GESTURES (HP & TABLET)
+   UTILITAS & KONTROL GESTUR
 ============================================================ */
-document.addEventListener('touchstart', (e) => {
-  if (e.touches.length === 1) {
-    touchStartX = e.touches[0].clientX;
-    touchStartY = e.touches[0].clientY;
+function extractFileName(pathOrUrl) {
+  try {
+    const clean = pathOrUrl.split('?')[0].split('#')[0];
+    return decodeURIComponent(clean.substring(clean.lastIndexOf('/') + 1));
+  } catch (e) {
+    return pathOrUrl;
   }
-}, { passive: true });
+}
 
-document.addEventListener('touchend', (e) => {
-  if (!e.changedTouches.length) return;
-
-  const touchEndX = e.changedTouches[0].clientX;
-  const touchEndY = e.changedTouches[0].clientY;
-
-  const deltaX = touchEndX - touchStartX;
-  const deltaY = touchEndY - touchStartY;
-
-  // Gerakan swipe horizontal yang presisi
-  if (Math.abs(deltaX) > 45 && Math.abs(deltaX) > Math.abs(deltaY)) {
-    if (deltaX < 0) {
-      nextWebp(); // Geser Kiri -> Selanjutnya
-    } else {
-      prevWebp(); // Geser Kanan -> Sebelumnya
-    }
+function toggleCleanUI() {
+  isUIHidden = !isUIHidden;
+  if (isUIHidden) {
+    document.body.classList.add('ui-hidden');
+    showToast('👁️ Mode Layar Bersih (Ketuk layar untuk menampilkan)');
+  } else {
+    document.body.classList.remove('ui-hidden');
   }
-}, { passive: true });
-
-/* ============================================================
-   NAVIGASI KEYBOARD (PANAH KIRI & KANAN)
-============================================================ */
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'ArrowRight') nextWebp();
-  if (e.key === 'ArrowLeft') prevWebp();
-  if (e.key === 'Space' || e.code === 'Space') {
-    e.preventDefault();
-    toggleAutoPlay();
-  }
-  if (e.key === 'Escape') closeGalleryModal();
-});
-
-/* ============================================================
-   UTILITAS & HELPER
-============================================================ */
-function showLoading(show) {
-  document.getElementById('loadingBox').style.display = show ? 'flex' : 'none';
 }
 
 function toggleFullscreen() {
@@ -862,17 +1188,64 @@ function toggleFullscreen() {
 let toastTimer = null;
 function showToast(msg) {
   const toast = document.getElementById('toast');
-  toast.innerText = msg;
+  const msgSpan = document.getElementById('toastMsg');
+  msgSpan.innerText = msg;
   toast.classList.add('show');
 
   if (toastTimer) clearTimeout(toastTimer);
   toastTimer = setTimeout(() => {
     toast.classList.remove('show');
-  }, 2500);
+  }, 2600);
 }
 
-// Jalankan aplikasi saat halaman siap
-document.addEventListener('DOMContentLoaded', initApp);
+/* GESTUR USAP LAYAR HP */
+document.addEventListener('touchstart', (e) => {
+  if (e.touches.length === 1) {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    touchTimeStart = Date.now();
+  }
+}, { passive: true });
+
+document.addEventListener('touchend', (e) => {
+  if (!e.changedTouches.length) return;
+
+  const touchEndX = e.changedTouches[0].clientX;
+  const touchEndY = e.changedTouches[0].clientY;
+  const touchDuration = Date.now() - touchTimeStart;
+
+  const deltaX = touchEndX - touchStartX;
+  const deltaY = touchEndY - touchStartY;
+
+  if (Math.abs(deltaX) < 8 && Math.abs(deltaY) < 8 && touchDuration < 250) {
+    const target = e.target;
+    if (!target.closest('.app-header') && !target.closest('.app-footer') && !target.closest('.modal-gallery') && !target.closest('.nav-arrow')) {
+      toggleCleanUI();
+    }
+    return;
+  }
+
+  if (Math.abs(deltaX) > 40 && Math.abs(deltaX) > Math.abs(deltaY)) {
+    if (deltaX < 0) {
+      nextWebp();
+    } else {
+      prevWebp();
+    }
+  }
+}, { passive: true });
+
+/* KONTROL KEYBOARD */
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight') nextWebp();
+  if (e.key === 'ArrowLeft') prevWebp();
+  if (e.key === 'Space' || e.code === 'Space') {
+    e.preventDefault();
+    toggleAutoPlay();
+  }
+  if (e.key === 'Escape') closeGalleryModal();
+  if (e.key === 'f' || e.key === 'F') toggleFullscreen();
+  if (e.key === 'h' || e.key === 'H') toggleCleanUI();
+});
 </script>
 
 </body>
