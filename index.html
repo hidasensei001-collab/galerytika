@@ -8,6 +8,15 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Galery Tika — WebP Gallery Premium</title>
 
+<!-- ============================================================
+     SETTING UTAMA SANDI WEB (BARIS 12)
+     Ubah `true` untuk ON (PAKAI SANDI)
+     Ubah `false` untuk OFF (TANPA SANDI)
+     ============================================================ -->
+<script>
+  const ENABLE_PASSWORD = true;
+</script>
+
 <link rel="preconnect" href="https://api.github.com" crossorigin>
 
 <style>
@@ -39,6 +48,50 @@ button{font:inherit;color:inherit;border:none;outline:none;background:none;}
 #app{
   position:fixed;inset:0;overflow:hidden;background:#030508;
   display:flex;flex-direction:column;justify-content:space-between;
+}
+
+/* ---------- PASSWORD SCREEN (PROTEKSI WEB) ---------- */
+.password-screen{
+  position:fixed;inset:0;z-index:99999;
+  background:#06080c;
+  display:flex;align-items:center;justify-content:center;
+  padding:20px;
+  backdrop-filter:blur(25px);
+  -webkit-backdrop-filter:blur(25px);
+}
+.password-card{
+  width:min(340px,100%);padding:28px 22px;
+  border:1px solid var(--border);border-radius:24px;
+  background:rgba(12,17,24,0.92);backdrop-filter:blur(20px);
+  text-align:center;box-shadow:var(--shadow);
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+}
+.password-icon{
+  font-size:30px;width:54px;height:54px;border-radius:16px;
+  background:rgba(255,255,255,0.05);border:1px solid var(--border);
+  display:grid;place-items:center;margin-bottom:4px;
+}
+.password-title{font-size:17px;font-weight:850;color:var(--text);}
+.password-sub{font-size:12px;color:var(--muted);margin-bottom:8px;}
+.password-input{
+  width:100%;height:44px;padding:0 14px;border-radius:12px;
+  border:1px solid var(--border);background:rgba(255,255,255,0.06);
+  color:var(--text);font-size:14px;outline:none;text-align:center;
+  transition:all 0.2s ease;
+}
+.password-input:focus{
+  border-color:var(--accent);box-shadow:0 0 12px var(--accent-glow);
+}
+.password-btn{
+  width:100%;height:44px;margin-top:10px;border-radius:12px;
+  background:linear-gradient(145deg,var(--accent2),var(--accent));
+  color:#03130c;font-weight:850;font-size:14px;cursor:pointer;
+  border:none;box-shadow:0 4px 20px var(--accent-glow);
+  transition:transform 0.18s ease;
+}
+.password-btn:active{transform:scale(0.97);}
+.password-error{
+  font-size:11px;color:#ff4d4d;display:none;font-weight:700;margin-top:4px;
 }
 
 /* ---------- AMBIENT GLOW BACKGROUND (CROSS-FADE IMPROVED) ---------- */
@@ -352,6 +405,21 @@ button{font:inherit;color:inherit;border:none;outline:none;background:none;}
 </head>
 
 <body>
+
+<!-- POPUP INPUT SANDI (JIKA ACTIVE) -->
+<div id="password-screen" class="password-screen" style="display:none;">
+  <div class="password-card">
+    <div class="password-icon">🔒</div>
+    <div class="password-title">Galeri Terkunci</div>
+    <div class="password-sub">Masukkan sandi untuk melanjutkan</div>
+    <form onsubmit="submitPassword(event)" style="width:100%;">
+      <input type="password" id="passInput" class="password-input" placeholder="Masukkan Sandi..." autocomplete="current-password" autofocus>
+      <button type="submit" class="password-btn">Buka Galeri</button>
+    </form>
+    <div id="passError" class="password-error">Sandi salah, silakan coba lagi!</div>
+  </div>
+</div>
+
 <div id="app">
   <!-- Ambient Blur Background (Layered Cross-Fade) -->
   <div id="ambient-bg-1" class="ambient-bg active"></div>
@@ -438,6 +506,62 @@ button{font:inherit;color:inherit;border:none;outline:none;background:none;}
 </div>
 
 <script>
+/* ============================================================
+   SISTEM KEAMANAN TERENKRIPSI (SANDI: maubuka)
+   ============================================================ */
+async function verifyPasswordHash(input){
+  if(window.crypto && crypto.subtle){
+    try{
+      const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(input));
+      const hashHex = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+      if(hashHex === "eb474f0ab78236df9f0069ac4241b3c795031e2916a5a969fded03d2cb4bc851") return true;
+    }catch(e){}
+  }
+  let h = 0x811c9dc5;
+  for(let i = 0; i < input.length; i++){
+    h ^= input.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  return (h >>> 0).toString(16) === "9ad433cf";
+}
+
+async function submitPassword(e){
+  if(e) e.preventDefault();
+  const input = document.getElementById("passInput");
+  const errEl = document.getElementById("passError");
+  const passVal = input ? input.value : "";
+
+  const isValid = await verifyPasswordHash(passVal);
+  if(isValid){
+    sessionStorage.setItem("app_auth", "1");
+    document.getElementById("password-screen").style.display = "none";
+    init();
+  }else{
+    if(errEl) errEl.style.display = "block";
+    if(input){
+      input.value = "";
+      input.focus();
+    }
+  }
+}
+
+function checkAuthAndStart(){
+  const passScreen = document.getElementById("password-screen");
+  if(typeof ENABLE_PASSWORD !== "undefined" && ENABLE_PASSWORD){
+    if(sessionStorage.getItem("app_auth") === "1"){
+      if(passScreen) passScreen.style.display = "none";
+      init();
+    }else{
+      if(passScreen) passScreen.style.display = "flex";
+      const input = document.getElementById("passInput");
+      if(input) setTimeout(() => input.focus(), 150);
+    }
+  }else{
+    if(passScreen) passScreen.style.display = "none";
+    init();
+  }
+}
+
 /* ============================================================
    KONFIGURASI GITHUB & APLIKASI
    ============================================================ */
@@ -997,7 +1121,7 @@ async function init(){
   }
 }
 
-document.addEventListener("DOMContentLoaded",init);
+document.addEventListener("DOMContentLoaded", checkAuthAndStart);
 </script>
 </body>
 </html>
