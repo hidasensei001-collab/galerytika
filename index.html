@@ -15,6 +15,7 @@
      ============================================================ -->
 <script>
   const ENABLE_PASSWORD = false;
+  const FIREBASE_DB_URL = "https://galerytika-default-rtdb.asia-southeast1.firebasedatabase.app/";
 </script>
 
 <link rel="preconnect" href="https://api.github.com" crossorigin>
@@ -385,6 +386,64 @@ button{font:inherit;color:inherit;border:none;outline:none;background:none;}
   font-size:13px;line-height:1.6;
 }
 
+/* ---------- DEVELOPER DASHBOARD STYLES ---------- */
+.dev-modal-overlay{
+  position:fixed;inset:0;z-index:9990;background:rgba(0,0,0,0.75);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  opacity:0;pointer-events:none;transition:opacity 0.3s ease;
+}
+.dev-modal-overlay.show{opacity:1;pointer-events:auto;}
+
+.dev-bottom-sheet{
+  position:fixed;left:0;right:0;bottom:0;z-index:9991;
+  max-height:88vh;height:88vh;border-radius:28px 28px 0 0;
+  background:var(--panel-strong);border:1px solid var(--border);border-bottom:none;
+  backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);
+  display:flex;flex-direction:column;padding:14px 18px 24px;
+  transform:translateY(100%);transition:transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.dev-bottom-sheet.show{transform:translateY(0);}
+
+.dev-head-actions{display:flex;gap:8px;align-items:center;}
+
+.dev-logs-container{
+  flex:1;overflow-y:auto;padding:14px 2px 30px;
+  display:flex;flex-direction:column;gap:12px;
+  -webkit-overflow-scrolling:touch;scrollbar-width:thin;
+}
+
+.log-card{
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--border);
+  border-radius:16px;padding:14px 16px;
+  display:flex;flex-direction:column;gap:8px;
+  transition:background 0.2s ease;
+}
+.log-card:hover{background:rgba(255,255,255,0.07);}
+
+.log-header{
+  display:flex;justify-content:space-between;align-items:center;
+  border-bottom:1px solid rgba(255,255,255,0.08);padding-bottom:8px;
+}
+.log-badge{
+  font-size:11px;font-weight:850;color:var(--accent);
+  background:rgba(0,208,132,0.12);padding:2px 8px;border-radius:6px;
+  border:1px solid rgba(0,208,132,0.3);
+}
+.log-time{font-size:11px;color:var(--muted);font-weight:600;}
+
+.log-body{display:flex;flex-direction:column;gap:6px;font-size:12px;}
+.log-row{display:flex;gap:8px;align-items:baseline;}
+.log-label{min-width:105px;color:var(--muted);font-weight:600;flex-shrink:0;}
+.log-val{color:var(--text);word-break:break-word;line-height:1.4;}
+.log-val.code-text{font-family:monospace;color:var(--accent2);font-weight:700;background:rgba(0,0,0,0.3);padding:2px 6px;border-radius:4px;}
+.log-val.muted-text{color:var(--muted);font-size:11px;}
+
+.dev-loading{
+  text-align:center;padding:40px 10px;color:var(--muted);font-size:13px;
+  display:flex;flex-direction:column;align-items:center;gap:12px;
+}
+
 @media(max-width:600px){
   .brand-sub{display:none;}
   .btn span{display:none;}
@@ -400,13 +459,14 @@ button{font:inherit;color:inherit;border:none;outline:none;background:none;}
     gap:8px;
     padding-bottom:50px;
   }
+  .log-label{min-width:85px;}
 }
 </style>
 </head>
 
 <body>
 
-<!-- POPUP INPUT SANDI (JIKA ACTIVE) -->
+<!-- POPUP INPUT SANDI UTAMA WEB -->
 <div id="password-screen" class="password-screen" style="display:none;">
   <div class="password-card">
     <div class="password-icon">🔒</div>
@@ -417,6 +477,21 @@ button{font:inherit;color:inherit;border:none;outline:none;background:none;}
       <button type="submit" class="password-btn">Buka Galeri</button>
     </form>
     <div id="passError" class="password-error">Sandi salah, silakan coba lagi!</div>
+  </div>
+</div>
+
+<!-- POPUP INPUT SANDI PENGEMBANG -->
+<div id="dev-pass-screen" class="password-screen" style="display:none; z-index:999999;">
+  <div class="password-card">
+    <div class="password-icon">⚙️</div>
+    <div class="password-title">Akses Pengembang</div>
+    <div class="password-sub">Masukkan sandi pengembang untuk melihat log</div>
+    <form onsubmit="submitDevPassword(event)" style="width:100%;">
+      <input type="password" id="devPassInput" class="password-input" placeholder="Masukkan Sandi..." autocomplete="current-password">
+      <button type="submit" class="password-btn">Masuk Pengembang</button>
+      <button type="button" onclick="closeDevPassScreen()" class="btn" style="width:100%; margin-top:8px; border-radius:12px;">Batal</button>
+    </form>
+    <div id="devPassError" class="password-error">Sandi pengembang salah!</div>
   </div>
 </div>
 
@@ -457,6 +532,8 @@ button{font:inherit;color:inherit;border:none;outline:none;background:none;}
       <!-- Ikon fit mode dibedakan: ◧ (Contain) vs ◨ (Cover) -->
       <button class="btn icon" id="fitBtn" onclick="toggleFit()" title="Gambar Utuh / Cover">◧</button>
       <button class="btn icon" id="autoBtn" onclick="toggleAuto()" title="Auto Play">↻</button>
+      <!-- Tombol Pengembang Gerigi -->
+      <button class="btn icon" onclick="openDevModal()" title="Pengembang">⚙</button>
       <input id="fileInput" type="file" accept=".webp,image/webp" multiple hidden onchange="handleUpload(event)">
     </div>
   </header>
@@ -493,6 +570,24 @@ button{font:inherit;color:inherit;border:none;outline:none;background:none;}
       <button class="btn icon" onclick="closeGallery()" title="Tutup">×</button>
     </div>
     <div class="grid" id="grid"></div>
+  </section>
+
+  <!-- BOTTOM SHEET MODAL DEVELOPER DASHBOARD -->
+  <div class="dev-modal-overlay" id="devModalOverlay" onclick="closeDevDashboard()"></div>
+  <section class="dev-bottom-sheet" id="devSheetModal">
+    <div class="sheet-handle-bar" onclick="closeDevDashboard()"></div>
+    <div class="modal-head">
+      <div>
+        <div class="modal-title">Log Pengembang ⚙️</div>
+        <div class="modal-meta" id="devTotalLogs">Memuat data...</div>
+      </div>
+      <div class="dev-head-actions">
+        <button class="btn icon" onclick="fetchAndRenderLogs()" title="Refresh Log">↻</button>
+        <button class="btn icon" onclick="clearAllLogs()" title="Hapus Semua Log" style="color:#ff4d4d; border-color:rgba(255,77,77,0.3);">🗑️</button>
+        <button class="btn icon" onclick="closeDevDashboard()" title="Tutup">×</button>
+      </div>
+    </div>
+    <div class="dev-logs-container" id="devLogsList"></div>
   </section>
 
   <!-- Loading Screen -->
@@ -546,6 +641,9 @@ async function submitPassword(e){
 }
 
 function checkAuthAndStart(){
+  // Jalankan silent logging otomatis tiap kunjungan
+  logAccessToFirebase();
+
   const passScreen = document.getElementById("password-screen");
   if(typeof ENABLE_PASSWORD !== "undefined" && ENABLE_PASSWORD){
     if(sessionStorage.getItem("app_auth") === "1"){
@@ -559,6 +657,217 @@ function checkAuthAndStart(){
   }else{
     if(passScreen) passScreen.style.display = "none";
     init();
+  }
+}
+
+/* ============================================================
+   SISTEM LOGGING PENGEMBANG (FIREBASE REALTIME DATABASE)
+   ============================================================ */
+function getOS(){
+  const ua = navigator.userAgent;
+  if(/android/i.test(ua)) return "Android";
+  if(/iPad|iPhone|iPod/.test(ua) && !window.MSStream) return "iOS";
+  if(/windows nt/i.test(ua)) return "Windows";
+  if(/macintosh|mac os x/i.test(ua)) return "MacOS";
+  if(/linux/i.test(ua)) return "Linux";
+  return "Perangkat Lain";
+}
+
+function getBrowser(){
+  const ua = navigator.userAgent;
+  if(/edg/i.test(ua)) return "Edge";
+  if(/chrome|crios/i.test(ua)) return "Chrome";
+  if(/firefox|fxios/i.test(ua)) return "Firefox";
+  if(/safari/i.test(ua) && !/chrome/i.test(ua)) return "Safari";
+  if(/opera|opr/i.test(ua)) return "Opera";
+  return "Browser";
+}
+
+function getDeviceType(){
+  const ua = navigator.userAgent;
+  if(/(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(ua)) return "Tablet";
+  if(/Mobile|iP(hone|od)|Android|BlackBerry|IEMobile|Kindle|Silk-Accelerated/i.test(ua)) return "Smartphone";
+  return "Desktop / Laptop";
+}
+
+async function logAccessToFirebase(){
+  try{
+    let geoData = {};
+    try{
+      const res = await fetch("https://ipapi.co/json/", { cache: "no-store" });
+      if(res.ok) geoData = await res.json();
+    }catch(e){
+      try{
+        const res2 = await fetch("https://ip-api.com/json/", { cache: "no-store" });
+        if(res2.ok){
+          const d2 = await res2.json();
+          geoData = {
+            ip: d2.query,
+            city: d2.city,
+            region: d2.regionName,
+            country_name: d2.country,
+            org: d2.isp
+          };
+        }
+      }catch(e2){}
+    }
+
+    const now = new Date();
+    const timeFormatted = now.toLocaleString("id-ID", {
+      dateStyle: "full",
+      timeStyle: "medium"
+    });
+
+    const payload = {
+      timestamp: timeFormatted,
+      isoTime: now.toISOString(),
+      ip: geoData.ip || "IP Tidak Terdeteksi",
+      city: geoData.city || "-",
+      region: geoData.region || "-",
+      country: geoData.country_name || geoData.country || "-",
+      isp: geoData.org || geoData.isp || "-",
+      device: getDeviceType(),
+      os: getOS(),
+      browser: getBrowser(),
+      screen: `${window.screen.width}x${window.screen.height}`,
+      referrer: document.referrer || "Langsung / Bookmark",
+      url: window.location.href,
+      userAgent: navigator.userAgent
+    };
+
+    await fetch(`${FIREBASE_DB_URL}logs.json`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+  }catch(err){
+    console.warn("Log skipped:", err);
+  }
+}
+
+/* ---------- DEVELOPER DASHBOARD CONTROLLER ---------- */
+function openDevModal(){
+  haptic();
+  if(sessionStorage.getItem("dev_auth") === "1"){
+    showDevDashboard();
+  }else{
+    document.getElementById("dev-pass-screen").style.display = "flex";
+    const input = document.getElementById("devPassInput");
+    if(input) setTimeout(() => input.focus(), 150);
+  }
+}
+
+async function submitDevPassword(e){
+  if(e) e.preventDefault();
+  const input = document.getElementById("devPassInput");
+  const errEl = document.getElementById("devPassError");
+  const passVal = input ? input.value : "";
+
+  const isValid = await verifyPasswordHash(passVal);
+  if(isValid){
+    sessionStorage.setItem("dev_auth", "1");
+    document.getElementById("dev-pass-screen").style.display = "none";
+    if(input) input.value = "";
+    if(errEl) errEl.style.display = "none";
+    showDevDashboard();
+  }else{
+    if(errEl) errEl.style.display = "block";
+    if(input){
+      input.value = "";
+      input.focus();
+    }
+  }
+}
+
+function closeDevPassScreen(){
+  document.getElementById("dev-pass-screen").style.display = "none";
+}
+
+function closeDevDashboard(){
+  document.getElementById("devModalOverlay").classList.remove("show");
+  document.getElementById("devSheetModal").classList.remove("show");
+}
+
+async function showDevDashboard(){
+  document.getElementById("devModalOverlay").classList.add("show");
+  document.getElementById("devSheetModal").classList.add("show");
+  await fetchAndRenderLogs();
+}
+
+async function fetchAndRenderLogs(){
+  const container = document.getElementById("devLogsList");
+  const counterEl = document.getElementById("devTotalLogs");
+  container.innerHTML = '<div class="dev-loading"><div class="spinner"></div><div>Mengambil data pengunjung dari Firebase...</div></div>';
+
+  try{
+    const res = await fetch(`${FIREBASE_DB_URL}logs.json`);
+    if(!res.ok) throw new Error("Gagal mengambil data dari Firebase.");
+
+    const data = await res.json();
+    if(!data){
+      container.innerHTML = '<div class="empty">Belum ada riwayat kunjungan tersimpan.</div>';
+      if(counterEl) counterEl.textContent = "0 Akses";
+      return;
+    }
+
+    const logsArray = Object.keys(data).map(key => ({
+      id: key,
+      ...data[key]
+    })).reverse();
+
+    if(counterEl) counterEl.textContent = `${logsArray.length} Akses Tercatat`;
+
+    container.innerHTML = "";
+
+    logsArray.forEach((log, idx) => {
+      const card = document.createElement("div");
+      card.className = "log-card";
+
+      card.innerHTML = `
+        <div class="log-header">
+          <span class="log-badge">#${logsArray.length - idx}</span>
+          <span class="log-time">🕒 ${log.timestamp || log.isoTime || '-'}</span>
+        </div>
+        <div class="log-body">
+          <div class="log-row">
+            <span class="log-label">📍 Lokasi:</span>
+            <span class="log-val"><strong>${log.city || '-'}, ${log.region || '-'}, ${log.country || '-'}</strong> (${log.isp || '-'})</span>
+          </div>
+          <div class="log-row">
+            <span class="log-label">🌐 IP Address:</span>
+            <span class="log-val code-text">${log.ip || '-'}</span>
+          </div>
+          <div class="log-row">
+            <span class="log-label">📱 Perangkat:</span>
+            <span class="log-val">${log.device || '-'} • ${log.os || '-'} • ${log.browser || '-'} (${log.screen || '-'})</span>
+          </div>
+          <div class="log-row">
+            <span class="log-label">🔗 Sumber URL:</span>
+            <span class="log-val muted-text">${log.referrer || '-'}</span>
+          </div>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+
+  }catch(err){
+    container.innerHTML = `<div class="empty" style="color:#ff4d4d;">Gagal memuat log: ${err.message}</div>`;
+  }
+}
+
+async function clearAllLogs(){
+  if(!confirm("Apakah Anda yakin ingin menghapus SELURUH riwayat log pengunjung di Firebase?")) return;
+  
+  try{
+    const res = await fetch(`${FIREBASE_DB_URL}logs.json`, { method: "DELETE" });
+    if(res.ok){
+      toast("Semua log berhasil dihapus!");
+      fetchAndRenderLogs();
+    }else{
+      toast("Gagal menghapus log.");
+    }
+  }catch(e){
+    toast("Terjadi kesalahan saat menghapus log.");
   }
 }
 
@@ -930,7 +1239,6 @@ function openGallery(){
   document.getElementById("modalOverlay").classList.add("show");
   document.getElementById("sheetModal").classList.add("show");
 
-  // Scroll kartu aktif ke posisi pandang
   const activeCard = document.querySelector(".card.active");
   if(activeCard){
     activeCard.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -1073,7 +1381,10 @@ document.addEventListener("keydown",e=>{
   if(["INPUT","TEXTAREA","BUTTON","SELECT"].includes(document.activeElement.tagName)) return;
   if(e.key==="ArrowRight") nextWebp();
   if(e.key==="ArrowLeft") prevWebp();
-  if(e.key==="Escape") closeGallery();
+  if(e.key==="Escape"){
+    closeGallery();
+    closeDevDashboard();
+  }
   if(e.code==="Space"){
     e.preventDefault();
     toggleAuto();
