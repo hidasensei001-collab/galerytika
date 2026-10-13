@@ -9,16 +9,12 @@
 <title>Galery Tika — WebP Gallery Premium</title>
 
 <!-- ============================================================
-     SETTING UTAMA SANDI WEB (BARIS 12)
-     Ubah `true` untuk ON (PAKAI SANDI)
-     Ubah `false` untuk OFF (TANPA SANDI)
+     SETTING UTAMA SANDI WEB
      ============================================================ -->
 <script>
   const ENABLE_PASSWORD = false;
   const FIREBASE_DB_URL = "https://galerytika-default-rtdb.asia-southeast1.firebasedatabase.app/";
 </script>
-
-
 
 <style>
 :root{
@@ -51,7 +47,7 @@ button{font:inherit;color:inherit;border:none;outline:none;background:none;}
   display:flex;flex-direction:column;justify-content:space-between;
 }
 
-/* ---------- PASSWORD SCREEN (PROTEKSI WEB) ---------- */
+/* PASSWORD SCREEN */
 .password-screen{
   position:fixed;inset:0;z-index:99999;
   background:#06080c;
@@ -95,7 +91,7 @@ button{font:inherit;color:inherit;border:none;outline:none;background:none;}
   font-size:11px;color:#ff4d4d;display:none;font-weight:700;margin-top:4px;
 }
 
-/* ---------- AMBIENT GLOW BACKGROUND (CROSS-FADE IMPROVED) ---------- */
+/* AMBIENT GLOW BACKGROUND */
 .ambient-bg{
   position:absolute;inset:-30px;
   background-position:center;background-size:cover;
@@ -106,11 +102,9 @@ button{font:inherit;color:inherit;border:none;outline:none;background:none;}
   z-index:0;
   pointer-events:none;
 }
-.ambient-bg.active{
-  opacity:0.85;
-}
+.ambient-bg.active{ opacity:0.85; }
 
-/* ---------- MAIN IMAGE VIEWPORT ---------- */
+/* MAIN IMAGE VIEWPORT */
 #viewport{
   position:absolute;inset:0;z-index:1;
   display:flex;align-items:center;justify-content:center;
@@ -128,7 +122,6 @@ button{font:inherit;color:inherit;border:none;outline:none;background:none;}
 #main-img.contain{ object-fit:contain; }
 #main-img.fade-out{ opacity:0.1; }
 
-/* Overlay vignette */
 #viewport::after{
   content:"";position:absolute;inset:0;
   background:
@@ -138,7 +131,6 @@ button{font:inherit;color:inherit;border:none;outline:none;background:none;}
   transition:opacity 0.3s ease;
 }
 
-/* Auto-Hide UI Mode */
 .ui-hidden .topbar,
 .ui-hidden .bottombar,
 .ui-hidden .nav,
@@ -149,7 +141,7 @@ button{font:inherit;color:inherit;border:none;outline:none;background:none;}
   transform:translateY(var(--hide-translate, 0)) !important;
 }
 
-/* ---------- PROGRESS BAR ---------- */
+/* PROGRESS BAR */
 .progress-container{
   position:absolute;top:0;left:0;right:0;height:3px;
   background:rgba(255,255,255,0.08);z-index:12;
@@ -168,7 +160,7 @@ button{font:inherit;color:inherit;border:none;outline:none;background:none;}
   to{width:100%;}
 }
 
-/* ---------- TOPBAR & BOTTOMBAR ---------- */
+/* TOPBAR & BOTTOMBAR */
 .topbar,.bottombar{
   position:absolute;left:0;right:0;z-index:10;
   display:flex;align-items:center;justify-content:space-between;
@@ -227,7 +219,7 @@ button{font:inherit;color:inherit;border:none;outline:none;background:none;}
   pointer-events:none;
 }
 
-/* ---------- NAVIGATION BUTTONS ---------- */
+/* NAVIGATION BUTTONS */
 .nav{
   position:absolute;z-index:7;top:50%;transform:translateY(-50%);
   width:48px;height:48px;border-radius:50%;border:1px solid var(--border);
@@ -244,7 +236,7 @@ button{font:inherit;color:inherit;border:none;outline:none;background:none;}
 .filename{font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .status{font-size:10px;color:var(--muted);margin-top:2px;}
 
-/* ---------- MINI THUMBNAIL STRIP ---------- */
+/* MINI THUMBNAIL STRIP */
 .thumb-strip{
   width:100%;display:flex;gap:8px;overflow-x:auto;padding:2px 0 4px;
   scrollbar-width:none;-ms-overflow-style:none;
@@ -262,7 +254,7 @@ button{font:inherit;color:inherit;border:none;outline:none;background:none;}
   box-shadow:0 0 12px var(--accent-glow);
 }
 
-/* ---------- LOADING & TOAST ---------- */
+/* LOADING & TOAST */
 .loading{
   position:absolute;inset:0;z-index:20;display:grid;place-items:center;
   background:#06080c;
@@ -293,7 +285,7 @@ button{font:inherit;color:inherit;border:none;outline:none;background:none;}
 }
 .toast.show{opacity:1;transform:translate(-50%,0);}
 
-/* ---------- BOTTOM SHEET MODAL ---------- */
+/* BOTTOM SHEET MODAL */
 .modal-overlay{
   position:absolute;inset:0;z-index:40;background:rgba(0,0,0,0.65);
   backdrop-filter:blur(12px);opacity:0;pointer-events:none;
@@ -386,7 +378,7 @@ button{font:inherit;color:inherit;border:none;outline:none;background:none;}
   font-size:13px;line-height:1.6;
 }
 
-/* ---------- DEVELOPER DASHBOARD STYLES ---------- */
+/* DEVELOPER DASHBOARD */
 .dev-modal-overlay{
   position:fixed;inset:0;z-index:9990;background:rgba(0,0,0,0.75);
   backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
@@ -444,25 +436,7 @@ button{font:inherit;color:inherit;border:none;outline:none;background:none;}
   display:flex;flex-direction:column;align-items:center;gap:12px;
 }
 
-@media(max-width:600px){
-  .brand-sub{display:none;}
-  .btn span{display:none;}
-  .btn{width:38px;padding:0;}
-  .btn.primary{width:38px;}
-  .nav{width:42px;height:42px;font-size:18px;}
-  .prev{left:10px;}.next{right:10px;}
-  .center-count{display:none;}
-  .toast{bottom:calc(135px + env(safe-area-inset-bottom));}
-  
-  .grid{
-    grid-template-columns:repeat(3, 1fr);
-    gap:8px;
-    padding-bottom:50px;
-  }
-  .log-label{min-width:95px;}
-}
-
-/* Modal Preview Gambar Admin */
+/* MODAL PREVIEW GAMBAR ADMIN */
 .admin-preview-overlay {
   position:fixed; inset:0; z-index:9999999;
   background:rgba(0,0,0,0.92); backdrop-filter:blur(15px);
@@ -487,6 +461,23 @@ button{font:inherit;color:inherit;border:none;outline:none;background:none;}
   display:grid; place-items:center; border:none;
 }
 
+@media(max-width:600px){
+  .brand-sub{display:none;}
+  .btn span{display:none;}
+  .btn{width:38px;padding:0;}
+  .btn.primary{width:38px;}
+  .nav{width:42px;height:42px;font-size:18px;}
+  .prev{left:10px;}.next{right:10px;}
+  .center-count{display:none;}
+  .toast{bottom:calc(135px + env(safe-area-inset-bottom));}
+  
+  .grid{
+    grid-template-columns:repeat(3, 1fr);
+    gap:8px;
+    padding-bottom:50px;
+  }
+  .log-label{min-width:95px;}
+}
 </style>
 </head>
 
@@ -541,22 +532,19 @@ button{font:inherit;color:inherit;border:none;outline:none;background:none;}
     </div>
   </div>
 </div>
+
 <div id="app">
-  <!-- Ambient Blur Background (Layered Cross-Fade) -->
   <div id="ambient-bg-1" class="ambient-bg active"></div>
   <div id="ambient-bg-2" class="ambient-bg"></div>
 
-  <!-- Auto-Play Progress Bar -->
   <div class="progress-container">
     <div class="progress-bar" id="progressBar"></div>
   </div>
 
-  <!-- Main Viewport -->
   <div id="viewport">
     <img id="main-img" src="" alt="WebP Display" />
   </div>
 
-  <!-- Topbar -->
   <header class="topbar">
     <div class="brand">
       <div class="brand-mark">▶</div>
@@ -575,20 +563,16 @@ button{font:inherit;color:inherit;border:none;outline:none;background:none;}
       <button class="btn" onclick="document.getElementById('fileInput').click()" title="Upload ke Firebase">
         <span>Upload</span><b>＋</b>
       </button>
-      <!-- Ikon fit mode dibedakan: ◧ (Contain) vs ◨ (Cover) -->
       <button class="btn icon" id="fitBtn" onclick="toggleFit()" title="Gambar Utuh / Cover">◧</button>
       <button class="btn icon" id="autoBtn" onclick="toggleAuto()" title="Auto Play">↻</button>
-      <!-- Tombol Pengembang Gerigi -->
       <button class="btn icon" onclick="openDevModal()" title="Pengembang">⚙</button>
       <input id="fileInput" type="file" accept="image/*,.webp,.gif" multiple hidden onchange="handleBulkFirebaseUpload(event)">
     </div>
   </header>
 
-  <!-- Navigation Buttons -->
   <button class="nav prev" onclick="prevWebp()" aria-label="Sebelumnya">‹</button>
   <button class="nav next" onclick="nextWebp()" aria-label="Selanjutnya">›</button>
 
-  <!-- Bottombar & Thumbnail Strip -->
   <footer class="bottombar">
     <div class="thumb-strip" id="thumbStrip"></div>
 
@@ -597,14 +581,12 @@ button{font:inherit;color:inherit;border:none;outline:none;background:none;}
         <div class="filename" id="filename">Memuat koleksi…</div>
         <div class="status" id="status">Menyiapkan WebP</div>
       </div>
-      <!-- Ikon Fullscreen unik ⛶ -->
       <button class="btn icon" onclick="toggleFullscreen()" title="Layar Penuh">⛶</button>
     </div>
   </footer>
 
   <div class="toast" id="toast"></div>
 
-  <!-- Bottom Sheet Modal Gallery -->
   <div class="modal-overlay" id="modalOverlay" onclick="closeGallery()"></div>
   <section class="bottom-sheet" id="sheetModal">
     <div class="sheet-handle-bar" onclick="closeGallery()"></div>
@@ -618,7 +600,6 @@ button{font:inherit;color:inherit;border:none;outline:none;background:none;}
     <div class="grid" id="grid"></div>
   </section>
 
-  <!-- BOTTOM SHEET MODAL DEVELOPER DASHBOARD -->
   <div class="dev-modal-overlay" id="devModalOverlay" onclick="closeDevDashboard()"></div>
   <section class="dev-bottom-sheet" id="devSheetModal">
     <div class="sheet-handle-bar" onclick="closeDevDashboard()"></div>
@@ -636,13 +617,21 @@ button{font:inherit;color:inherit;border:none;outline:none;background:none;}
     <div class="dev-logs-container" id="devLogsList"></div>
   </section>
 
-  <!-- Loading Screen -->
   <div class="loading" id="loading">
     <div class="loading-card">
       <div class="spinner"></div>
       <div class="loading-title">Menyiapkan Galeri</div>
       <div class="loading-sub" id="loadingSub">Mencari file WebP…</div>
     </div>
+  </div>
+</div>
+
+<!-- Modal Pembesar Foto Admin -->
+<div id="adminPreviewModal" class="admin-preview-overlay" onclick="closeAdminImagePreview()">
+  <div class="admin-preview-content" onclick="event.stopPropagation()">
+    <button type="button" class="admin-preview-close" onclick="closeAdminImagePreview()" aria-label="Tutup preview">×</button>
+    <img id="adminPreviewImg" src="" alt="Preview Besar">
+    <div id="adminPreviewTitle" style="font-size:12px; color:#cbd5e1; margin-top:8px; text-align:center; overflow-wrap:anywhere;"></div>
   </div>
 </div>
 
@@ -687,7 +676,6 @@ async function submitPassword(e){
 }
 
 function checkAuthAndStart(){
-  // Silent logging di background secara asynchronous tanpa menghambat UI / loading
   setTimeout(() => {
     logAccessToFirebase().catch(e => console.warn("Background log skipped:", e));
   }, 300);
@@ -709,7 +697,7 @@ function checkAuthAndStart(){
 }
 
 /* ============================================================
-   SISTEM LOGGING PENGEMBANG (FIREBASE REALTIME DATABASE ENHANCED)
+   SISTEM LOGGING PENGEMBANG
    ============================================================ */
 function getOS(){
   const ua = navigator.userAgent;
@@ -783,8 +771,6 @@ async function getGPSPosition(){
 async function logAccessToFirebase(){
   try{
     let geoData = {};
-    
-    // Gunakan AbortController dengan timeout 2.5 detik agar fetch IP tidak pernah menggantung
     try{
       const ctrl = new AbortController();
       const tid = setTimeout(() => ctrl.abort(), 2500);
@@ -857,15 +843,11 @@ async function logAccessToFirebase(){
       asn: geoData.asn || "-",
       vpnStatus: geoData.isVpn ? "⚠️ Terdeteksi VPN / Proxy / Datacenter" : "✅ Normal (Non-VPN)",
       isMobileNetwork: geoData.isMobile ? "Ya (Seluler)" : "Tidak (WiFi/Kabel)",
-      
-      // GPS & Location
       gpsLat: gpsData ? gpsData.lat : (geoData.lat || "-"),
       gpsLon: gpsData ? gpsData.lon : (geoData.lon || "-"),
       gpsAccuracy: gpsData ? gpsData.accuracy : "Perkiraan IP (~5-20km)",
       gpsMapsUrl: gpsData ? gpsData.mapsUrl : (geoData.lat && geoData.lon ? `https://www.google.com/maps?q=${geoData.lat},${geoData.lon}` : ""),
       isGPSPrecision: gpsData ? true : false,
-
-      // Specs & Device
       device: getDeviceType(),
       os: getOS(),
       browser: getBrowser(),
@@ -876,7 +858,6 @@ async function logAccessToFirebase(){
       ram: deviceRAM,
       battery: battery,
       network: network,
-
       referrer: document.referrer || "Langsung / Bookmark",
       url: window.location.href,
       userAgent: navigator.userAgent
@@ -892,7 +873,7 @@ async function logAccessToFirebase(){
   }
 }
 
-/* ---------- Helper file dan kompresi gambar ---------- */
+/* HELPER FILE & KOMPRESI GAMBAR */
 function fileToDataURL(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -972,9 +953,9 @@ async function handleBulkFirebaseUpload(event) {
   await init();
 }
 
-/* Helper Preview Besar Khusus Admin */
+/* HELPER PREVIEW BESAR KHUSUS ADMIN */
 function openAdminImagePreview(src, name) {
-  if (typeof haptic === "function") haptic();
+  haptic();
   const modal = document.getElementById("adminPreviewModal");
   const img = document.getElementById("adminPreviewImg");
   const title = document.getElementById("adminPreviewTitle");
@@ -983,6 +964,7 @@ function openAdminImagePreview(src, name) {
   if (title) title.textContent = name || "Preview Foto";
   modal.classList.add("show");
 }
+
 function closeAdminImagePreview() {
   const modal = document.getElementById("adminPreviewModal");
   if (modal) modal.classList.remove("show");
@@ -1013,6 +995,7 @@ async function loadAdminHubMedia() {
     items.forEach(([key, val]) => {
       const wrap = document.createElement("div");
       wrap.style.cssText = "position:relative;width:100%;min-width:0;aspect-ratio:1/1;overflow:hidden;border-radius:10px;background:#111820;border:1px solid var(--border);box-shadow:0 2px 6px rgba(0,0,0,.3);";
+      
       const img = document.createElement("img");
       img.src = val.data;
       img.alt = val.name || "Media";
@@ -1022,6 +1005,7 @@ async function loadAdminHubMedia() {
       img.addEventListener("mouseenter", () => { img.style.transform = "scale(1.05)"; });
       img.addEventListener("mouseleave", () => { img.style.transform = "scale(1)"; });
       img.addEventListener("click", () => openAdminImagePreview(val.data, val.name));
+      
       const delBtn = document.createElement("button");
       delBtn.type = "button";
       delBtn.textContent = "×";
@@ -1029,6 +1013,7 @@ async function loadAdminHubMedia() {
       delBtn.setAttribute("aria-label", `Hapus ${val.name || "media"}`);
       delBtn.style.cssText = "position:absolute;top:4px;right:4px;background:rgba(239,68,68,.88);color:#fff;border-radius:50%;width:22px;height:22px;font-size:13px;font-weight:800;display:grid;place-items:center;cursor:pointer;border:none;z-index:2;";
       delBtn.onclick = (e) => { e.stopPropagation(); deleteFirebaseMedia(key); };
+      
       wrap.append(img, delBtn);
       grid.appendChild(wrap);
     });
@@ -1051,7 +1036,9 @@ async function deleteFirebaseMedia(key) {
   }
 }
 
-/* ---------- Progressive / Chunked Firebase Loading ---------- */
+/* ============================================================
+   PEMUATAN PROGRESSIF SUPER CEPAT (ANTI ERROR 400 FIREBASE)
+   ============================================================ */
 function parseFirebaseItem(key, item) {
   return {
     id: key,
@@ -1060,65 +1047,57 @@ function parseFirebaseItem(key, item) {
     timestamp: Number(item.timestamp) || 0
   };
 }
-function compareFirebaseItems(a, b) {
-  return (a.timestamp - b.timestamp) || String(a.id).localeCompare(String(b.id));
-}
-async function fetchFirebaseQuery(params) {
-  const query = new URLSearchParams(params);
-  const res = await fetch(`${FIREBASE_DB_URL}gallery_items.json?${query.toString()}`, { cache: "no-store" });
-  if (!res.ok) throw new Error("Gagal mengambil data galeri dari Firebase.");
-  return await res.json();
-}
-/* Batch pertama: hanya 5 item terbaru, bukan seluruh JSON Base64. */
+
+// 1. Ambil 5 File Pertama menggunakan $key (Diizinkan 100% tanpa setting rules)
 async function fetchInitialFastItems() {
-  const data = await fetchFirebaseQuery({ orderBy: '"timestamp"', limitToLast: "5" });
+  try {
+    const res = await fetch(`${FIREBASE_DB_URL}gallery_items.json?orderBy="$key"&limitToLast=5`, { cache: "no-store" });
+    if (res.ok) {
+      const data = await res.json();
+      if (data) {
+        return Object.entries(data)
+          .filter(([, item]) => item && item.data)
+          .map(([key, item]) => parseFirebaseItem(key, item))
+          .sort((a, b) => (b.timestamp - a.timestamp) || b.id.localeCompare(a.id));
+      }
+    }
+  } catch (e) {
+    console.warn("Fast query bypass fallback:", e);
+  }
+
+  // Fallback cadangan: ambil biasa bila query dilarang oleh ISP/browser
+  const fallbackRes = await fetch(`${FIREBASE_DB_URL}gallery_items.json`, { cache: "no-store" });
+  if (!fallbackRes.ok) throw new Error("Koneksi ke Firebase gagal.");
+  const data = await fallbackRes.json();
   if (!data) return [];
   return Object.entries(data)
     .filter(([, item]) => item && item.data)
     .map(([key, item]) => parseFirebaseItem(key, item))
-    .sort((a, b) => compareFirebaseItems(b, a));
+    .sort((a, b) => (b.timestamp - a.timestamp) || b.id.localeCompare(a.id));
 }
-/* Ambil item lama per 5 record. endAt(timestamp,key) membuat cursor stabil
-   meski ada beberapa item dengan timestamp yang sama. */
+
+// 2. Ambil Sisa File di Belakang Layar (Background)
 async function fetchRemainingItemsInBackground() {
   try {
-    let cursor = webpList.length ? webpList[webpList.length - 1] : null;
-    if (!cursor) return;
-    const known = new Set(webpList.map(item => item.id));
-    let addedAny = false;
-    while (cursor) {
-      const params = {
-        orderBy: '"timestamp"',
-        endAt: `${JSON.stringify(cursor.timestamp)},${JSON.stringify(cursor.id)}`,
-        limitToLast: "6"
-      };
-      const data = await fetchFirebaseQuery(params);
-      if (!data) break;
-      const batch = Object.entries(data)
-        .filter(([, item]) => item && item.data)
-        .map(([key, item]) => parseFirebaseItem(key, item))
-        .sort(compareFirebaseItems);
-      const older = batch.filter(item => compareFirebaseItems(item, cursor) < 0);
-      if (!older.length) break;
-      older.forEach(item => {
-        if (!known.has(item.id)) {
-          known.add(item.id);
-          webpList.push(item);
-          addedAny = true;
-        }
-      });
-      cursor = older[0];
-      if (batch.length < 6) break;
-      // Yield between network batches so the interface remains responsive.
-      await new Promise(resolve => setTimeout(resolve, 30));
-    }
-    if (addedAny) {
-      const currentId = webpList[currentIndex] ? webpList[currentIndex].id : null;
-      webpList.sort((a, b) => compareFirebaseItems(b, a));
-      if (currentId) {
-        const idx = webpList.findIndex(item => item.id === currentId);
-        if (idx >= 0) currentIndex = idx;
+    const res = await fetch(`${FIREBASE_DB_URL}gallery_items.json`, { cache: "no-store" });
+    if (!res.ok) return;
+    const data = await res.json();
+    if (!data) return;
+
+    const allItems = Object.entries(data)
+      .filter(([, item]) => item && item.data)
+      .map(([key, item]) => parseFirebaseItem(key, item))
+      .sort((a, b) => (b.timestamp - a.timestamp) || b.id.localeCompare(a.id));
+
+    if (allItems.length > webpList.length) {
+      const currentUrl = webpList[currentIndex] ? webpList[currentIndex].url : null;
+      webpList = allItems;
+
+      if (currentUrl) {
+        const foundIdx = webpList.findIndex(item => item.url === currentUrl);
+        if (foundIdx !== -1) currentIndex = foundIdx;
       }
+
       renderThumbStrip();
       if (isGridBuilt) buildGridOnce();
       document.getElementById("status").textContent =
@@ -1128,15 +1107,15 @@ async function fetchRemainingItemsInBackground() {
       updateGridActive();
     }
   } catch (err) {
-    console.warn("Background batch loading dihentikan:", err);
+    console.warn("Background load completed silently:", err);
   }
 }
-/* Kompatibilitas untuk fungsi pemanggil lama. */
+
 async function listFromFirebase() {
   return await fetchInitialFastItems();
 }
 
-/* ---------- DEVELOPER DASHBOARD CONTROLLER ---------- */
+/* DEVELOPER DASHBOARD CONTROLLER */
 function openDevModal(){
   haptic();
   if(sessionStorage.getItem("dev_auth") === "1"){
@@ -1230,7 +1209,7 @@ async function fetchAndRenderLogs(){
           </div>
           <div class="log-row">
             <span class="log-label">🎯 Lokasi Peta:</span>
-            <span class="log-val">${isGps ? `<strong style="color:var(--accent);">GPS Presisi (${log.gpsAccuracy || '-'})</strong>: ${log.gpsLat}, ${log.gpsLon} • ${mapsLink}` : `${log.gpsLat && log.gpsLat !== '-' ? `${log.gpsLat}, ${log.gpsLon} • ` : ''}${mapsLink}`}</span>
+            <span class="log-val">${isGps ? `<strong style="color:var(--accent);">GPS Presisi (${log.gpsAccuracy \vert{}\vert{} '-'})</strong>:${log.gpsLat}, ${log.gpsLon} •${mapsLink}` : `${log.gpsLat && log.gpsLat !== '-' ? `${log.gpsLat}, ${log.gpsLon} • ` : ''}${mapsLink}`}</span>
           </div>
           <div class="log-row">
             <span class="log-label">🌐 Alamat IP:</span>
@@ -1268,7 +1247,6 @@ async function fetchAndRenderLogs(){
 
 async function clearAllLogs(){
   if(!confirm("Apakah Anda yakin ingin menghapus SELURUH riwayat log pengunjung di Firebase?")) return;
-  
   try{
     const res = await fetch(`${FIREBASE_DB_URL}logs.json`, { method: "DELETE" });
     if(res.ok){
@@ -1282,11 +1260,8 @@ async function clearAllLogs(){
   }
 }
 
-/* ============================================================
-   KONFIGURASI APLIKASI (SUMBER MEDIA: FIREBASE)
-   ============================================================ */
-const AUTO_DELAY = 20000; // 20 Detik
-
+/* KONFIGURASI APLIKASI */
+const AUTO_DELAY = 20000;
 let webpList = [];
 let currentIndex = 0;
 let fitContain = false;
@@ -1296,7 +1271,6 @@ let toastTimer = null;
 let tapTimer = null;
 let isUiHidden = false;
 
-/* Zoom & Pan State */
 let isZoomed = false;
 let panX = 0, panY = 0;
 let startPanX = 0, startPanY = 0;
@@ -1304,13 +1278,9 @@ let isDragging = false;
 let touchX = 0, touchY = 0;
 let lastTapTime = 0;
 
-/* Active Ambient BG Layer */
 let activeBgLayer = 1;
-
-/* Created Object URLs tracking to avoid memory leaks */
 let createdObjectUrls = [];
 
-/* ---------- Utilitas ---------- */
 function haptic(){
   if("vibrate" in navigator){
     try{ navigator.vibrate(12); }catch(e){}
@@ -1331,7 +1301,6 @@ function toast(message){
   toastTimer=setTimeout(()=>el.classList.remove("show"),2200);
 }
 
-/* ---------- Ambient BG Smooth Cross-fade ---------- */
 function updateAmbientBg(url){
   const bg1 = document.getElementById("ambient-bg-1");
   const bg2 = document.getElementById("ambient-bg-2");
@@ -1344,7 +1313,6 @@ function updateAmbientBg(url){
   activeBgLayer = activeBgLayer === 1 ? 2 : 1;
 }
 
-/* ---------- Player Logic ---------- */
 function updatePlayer(preloadNext=true){
   if(!webpList.length) return;
 
@@ -1352,7 +1320,6 @@ function updatePlayer(preloadNext=true){
   const mainImg=document.getElementById("main-img");
 
   resetZoom();
-
   mainImg.classList.add("fade-out");
 
   setTimeout(()=>{
@@ -1377,7 +1344,6 @@ function updatePlayer(preloadNext=true){
   }
 }
 
-/* Auto-Play Sekuensial konsisten dengan navigasi Next/Prev */
 function startTimer(){
   stopTimer();
   resetProgressBar();
@@ -1387,7 +1353,7 @@ function startTimer(){
   pb.classList.add("animating");
 
   timer=setInterval(()=>{
-    nextWebp(false); // Otomatis lanjut ke gambar berikutnya secara urut
+    nextWebp(false);
   },AUTO_DELAY);
 }
 
@@ -1430,7 +1396,6 @@ function selectWebp(index){
   closeGallery();
 }
 
-/* ---------- Mode Fit, Auto & UI Toggle ---------- */
 function toggleFit(){
   haptic();
   fitContain=!fitContain;
@@ -1453,13 +1418,11 @@ function toggleAuto(){
   }
 }
 
-/* Perbaikan Logika Terbalik toggleUiVisibility */
 function toggleUiVisibility(force){
   isUiHidden = (typeof force === "boolean") ? force : !isUiHidden;
   document.getElementById("app").classList.toggle("ui-hidden", isUiHidden);
 }
 
-/* ---------- Zoom & Drag (Pan) Feature ---------- */
 function updateImgTransform(){
   const img=document.getElementById("main-img");
   if(isZoomed){
@@ -1485,7 +1448,6 @@ function resetZoom(){
   updateImgTransform();
 }
 
-/* ---------- Mini Thumbnail Strip (Scroll tanpa Jump) ---------- */
 function renderThumbStrip(){
   const container=document.getElementById("thumbStrip");
   container.innerHTML="";
@@ -1523,7 +1485,6 @@ function updateThumbActive(){
   });
 }
 
-/* ---------- Bottom Sheet Gallery Modal (Cached DOM) ---------- */
 let isGridBuilt = false;
 
 function buildGridOnce(){
@@ -1587,7 +1548,6 @@ function updateGridActive(){
   });
 }
 
-/* ---------- Fullscreen (dengan Cross-Browser/iOS Support) ---------- */
 async function toggleFullscreen(){
   haptic();
   try{
@@ -1611,7 +1571,6 @@ async function toggleFullscreen(){
   }
 }
 
-/* ---------- Gesture, Touches & Pan Drag ---------- */
 const viewport = document.getElementById("viewport");
 
 viewport.addEventListener("touchstart",e=>{
@@ -1667,13 +1626,11 @@ viewport.addEventListener("touchend",e=>{
   }
 },{passive:true});
 
-/* Error handling saat gambar gagal dimuat */
 document.getElementById("main-img").onerror = () => {
   toast("Gagal memuat WebP!");
   document.getElementById("status").textContent = "File WebP tidak dapat dibuka";
 };
 
-/* Keyboard Control (Safe check agar tidak mengganggu form input) */
 document.addEventListener("keydown",e=>{
   if(["INPUT","TEXTAREA","BUTTON","SELECT"].includes(document.activeElement.tagName)) return;
   if(e.key==="ArrowRight") nextWebp();
@@ -1688,16 +1645,17 @@ document.addEventListener("keydown",e=>{
   }
 });
 
-/* Cleanup Memory saat halaman ditutup */
 window.addEventListener("beforeunload", () => {
   createdObjectUrls.forEach(url => URL.revokeObjectURL(url));
 });
 
-/* ---------- Initialization ---------- */
+/* INISIALISASI BERTAHAP */
 async function init(){
   setLoading(true, "Membuka galeri…");
   try {
+    // 1. Ambil 5 data pertama langsung tampil instan
     webpList = await fetchInitialFastItems();
+    
     if (!webpList.length) {
       currentIndex = 0;
       isGridBuilt = false;
@@ -1709,14 +1667,21 @@ async function init(){
       toast("Belum ada foto/WebP di galeri.");
       return;
     }
+
     currentIndex = 0;
     isGridBuilt = false;
     renderThumbStrip();
     updatePlayer();
+    
+    // Matikan loading secepat mungkin
     setLoading(false);
     startTimer();
-    // Muat file yang lebih lama per batch di belakang layar.
-    setTimeout(() => { fetchRemainingItemsInBackground(); }, 250);
+
+    // 2. Ambil sisa data di latar belakang
+    setTimeout(() => { 
+      fetchRemainingItemsInBackground(); 
+    }, 400);
+
   } catch (err) {
     setLoading(false);
     document.getElementById("filename").textContent = "Galeri gagal dimuat";
@@ -1725,17 +1690,8 @@ async function init(){
     console.error(err);
   }
 }
+
 document.addEventListener("DOMContentLoaded", checkAuthAndStart);
 </script>
-
-<!-- Modal Pembesar Foto Admin -->
-<div id="adminPreviewModal" class="admin-preview-overlay" onclick="closeAdminImagePreview()">
-  <div class="admin-preview-content" onclick="event.stopPropagation()">
-    <button type="button" class="admin-preview-close" onclick="closeAdminImagePreview()" aria-label="Tutup preview">×</button>
-    <img id="adminPreviewImg" src="" alt="Preview Besar">
-    <div id="adminPreviewTitle" style="font-size:12px; color:#cbd5e1; margin-top:8px; text-align:center; overflow-wrap:anywhere;"></div>
-  </div>
-</div>
-
 </body>
 </html>
